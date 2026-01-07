@@ -32,7 +32,7 @@ export default function App() {
                     <div className="flex flex-wrap items-center justify-between gap-4 py-6">
                         {/* Left: logo */}
                         <div className="flex items-center gap-3">
-                            <img src="/icon.ico" alt="Stashed" className="h-9 w-9 rounded-xl" />
+                            <img src="/logo_white.png" alt="Stashed" className="h-9 w-9" />
                             <div className="leading-tight">
                                 <div className="font-semibold">Stashed</div>
                                 <div className="text-xs text-white/60">Media Collection</div>
