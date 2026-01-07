@@ -57,6 +57,27 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+@keyframes bounce-x {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(8px);
+  }
+}
+
+.animate-bounce-x {
+  animation: bounce-x 1.2s infinite;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari */
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
