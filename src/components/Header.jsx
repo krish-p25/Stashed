@@ -33,7 +33,7 @@ export default function Header() {
                     >
                         <a className="hover:text-white" href="/how-it-works">How it works</a>
                         <a className="hover:text-white" href="/features">Features</a>
-                        <a className="hover:text-white" href="/#use-cases">Use cases</a>
+                        <a className="hover:text-white" href="/use-cases">Use cases</a>
                         <a className="hover:text-white" href="/#contact">Contact</a>
 
                         {/* CTA (desktop only) */}
