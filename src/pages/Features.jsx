@@ -24,7 +24,7 @@ export default function Features() {
             <Header />
 
             {/* Hero */}
-            <section className="pt-14 pb-12">
+            <section className="py-4 lg:py-10">
                 <Container>
                     <h1 className="text-4xl font-semibold tracking-tight">
                         Everything you need to collect event media
@@ -121,7 +121,7 @@ export default function Features() {
 
                         <div className="mt-6">
                             <a
-                                href="/#contact"
+                                href="/contact"
                                 className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                             >
                                 Get early access
