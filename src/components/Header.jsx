@@ -4,13 +4,13 @@ export default function Header() {
             <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 py-6">
                     {/* Left: logo */}
-                    <div className="flex items-center gap-3">
+                    <a href="/" className="flex items-center gap-3">
                         <img src="/logo_white.png" alt="Stashed" className="h-9 w-9" />
                         <div className="leading-tight">
-                            <div className="font-semibold">Stashed</div>
-                            <div className="text-xs text-white/60">Media Collection</div>
+                            <div className="font-semibold text-white">Stashed</div>
+                            <div className="text-xs text-white/60 font-normal">Media Collection</div>
                         </div>
-                    </div>
+                    </a>
 
                     {/* Middle (mobile only): CTA shown when nav is on next line */}
                     <div className="flex items-center md:hidden">
