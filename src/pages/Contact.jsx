@@ -34,10 +34,10 @@ export default function Contact() {
             <Header />
 
             {/* Hero */}
-            <section className="pt-14 pb-12">
+            <section className="py-4 lg:py-10">
                 <Container>
                     <h1 className="text-4xl font-semibold tracking-tight">Contact</h1>
-                    <p className="mt-4 max-w-2xl text-lg text-white/70">
+                    <p className="mt-4 max-w-full text-lg text-white/70">
                         Want early access, have a question, or planning an event? Send a message and we’ll get back to you.
                     </p>
                 </Container>
@@ -51,7 +51,7 @@ export default function Contact() {
                         <div className="lg:col-span-7">
                             <Card
                                 title="Send a message"
-                                desc="Fill this in and we’ll reply by email. (We’ll wire this to the backend later.)"
+                                desc="Fill this in and we’ll reply by email."
                             >
                                 <form
                                     className="grid gap-4"
@@ -164,7 +164,7 @@ export default function Contact() {
                                     </p>
                                     <div className="mt-6">
                                         <a
-                                            href="/#contact"
+                                            href="/contact"
                                             className="inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                                         >
                                             Get early access
@@ -172,24 +172,6 @@ export default function Contact() {
                                     </div>
                                 </div>
 
-                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                                    <MiniCard
-                                        title="Weddings"
-                                        desc="Collect guest moments without chasing uploads after the day."
-                                    />
-                                    <MiniCard
-                                        title="Corporate events"
-                                        desc="Centralise content for recaps and marketing with organiser control."
-                                    />
-                                    <MiniCard
-                                        title="Conferences"
-                                        desc="Capture attendee content and speaker highlights in one place."
-                                    />
-                                    <MiniCard
-                                        title="Parties"
-                                        desc="One link everyone can use—no more lost photos across chats."
-                                    />
-                                </div>
                             </div>
                         </div>
                     </div>
