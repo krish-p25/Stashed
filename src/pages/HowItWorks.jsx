@@ -35,7 +35,7 @@ export default function HowItWorks() {
             <Header />
 
             {/* Hero */}
-            <section className="pt-14 pb-12">
+            <section className="py-4 lg:py-10">
                 <Container>
                     <h1 className="text-4xl font-semibold tracking-tight">How Stashed works</h1>
                     <p className="mt-4 max-w-2xl text-lg text-white/70">
@@ -45,7 +45,7 @@ export default function HowItWorks() {
 
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <a
-                            href="/#contact"
+                            href="/contact"
                             className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                         >
                             Get early access
@@ -147,7 +147,7 @@ export default function HowItWorks() {
 
                         <div className="mt-6">
                             <a
-                                href="/#contact"
+                                href="/contact"
                                 className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                             >
                                 Get early access
