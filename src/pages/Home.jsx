@@ -181,7 +181,7 @@ export default function Home() {
         <div className="min-h-screen bg-zinc-950 text-white">
             {/* Top background glow */}
             <Glow />
-            
+
             {/* Nav */}
             <Header />
 
@@ -208,13 +208,13 @@ export default function Home() {
 
                                 <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                                     <a
-                                        href="#contact"
+                                        href="contact"
                                         className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                                     >
                                         Get early access
                                     </a>
                                     <a
-                                        href="#how"
+                                        href="how-it-works"
                                         className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
                                     >
                                         See how it works
