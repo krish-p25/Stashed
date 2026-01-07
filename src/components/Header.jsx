@@ -34,11 +34,11 @@ export default function Header() {
                         <a className="hover:text-white" href="/how-it-works">How it works</a>
                         <a className="hover:text-white" href="/features">Features</a>
                         <a className="hover:text-white" href="/use-cases">Use cases</a>
-                        <a className="hover:text-white" href="/#contact">Contact</a>
+                        <a className="hover:text-white" href="/contact">Contact</a>
 
                         {/* CTA (desktop only) */}
                         <a
-                            href="/#contact"
+                            href="/contact"
                             className="hidden md:inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                         >
                             Get early access
