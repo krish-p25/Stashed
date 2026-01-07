@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
 }
@@ -18,6 +20,158 @@ function Card({ title, desc }) {
         </div>
     );
 }
+
+function ReviewsScroller() {
+    const scrollerRef = useRef(null);
+    const [showHint, setShowHint] = useState(false);
+    const hideTimerRef = useRef(null);
+
+    const isMobile = () => window.matchMedia("(max-width: 767px)").matches; // < md
+
+    const updateHint = useCallback(() => {
+        const el = scrollerRef.current;
+        if (!el) return;
+
+        if (isMobile()) {
+            const atEnd = Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
+            setShowHint(!atEnd);
+        } else {
+            const atEnd = Math.ceil(el.scrollLeft + el.clientWidth) >= el.scrollWidth;
+            setShowHint(!atEnd);
+        }
+    }, []);
+
+    useEffect(() => {
+        const el = scrollerRef.current;
+        if (!el) return;
+
+        // Initial check after layout
+        const raf = requestAnimationFrame(updateHint);
+
+        const onScroll = () => {
+            // Hide immediately while scrolling
+            setShowHint(false);
+
+            // When scrolling stops, show again unless at end
+            if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+            hideTimerRef.current = setTimeout(() => {
+                updateHint();
+            }, 160);
+        };
+
+        const onResize = () => updateHint();
+
+        el.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onResize);
+
+        return () => {
+            cancelAnimationFrame(raf);
+            el.removeEventListener("scroll", onScroll);
+            window.removeEventListener("resize", onResize);
+            if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+        };
+    }, [updateHint]);
+
+    const reviews = [
+        {
+            quote:
+                "We used Stashed at our wedding and it was a game-changer. Everyone uploaded instantly and we had everything in one place the next day.",
+            name: "Sarah & Tom",
+            meta: "Wedding, London",
+        },
+        {
+            quote:
+                "Perfect for corporate events. No chasing people for photos — the QR code did all the work.",
+            name: "Mahesh Patel",
+            meta: "Event Manager",
+        },
+        {
+            quote:
+                "Clean, simple, and exactly what guests want. We now use Stashed for every client event.",
+            name: "Amelia Rhodes",
+            meta: "Wedding Planner",
+        },
+        {
+            quote:
+                "The gallery felt premium and the admin controls were simple. Clients love the after-event download.",
+            name: "Maya S.",
+            meta: "Event Coordinator",
+        },
+        {
+            quote:
+                "Guests actually used it. That’s the biggest win — no app installs and no friction.",
+            name: "Ollie K.",
+            meta: "Birthday Host",
+        },
+        {
+            quote:
+                "We printed the QR codes for tables and the uploads just flowed in. Brilliant for candid moments.",
+            name: "Hannah & Imran",
+            meta: "Wedding, Manchester",
+        },
+        {
+            quote:
+                "For conferences, it’s a great way to collect attendee content and speaker highlights in one place.",
+            name: "Daniel W.",
+            meta: "Conference Organiser",
+        },
+    ];
+
+    return (
+        <div className="mt-8">
+            {/* Relative wrapper so we can overlay the arrow */}
+            <div className="relative">
+                <div
+                    ref={scrollerRef}
+                    className="
+            max-h-[420px] overflow-y-auto pr-1
+            md:max-h-none md:overflow-y-hidden md:overflow-x-auto md:pr-0
+            scroll-smooth
+            md:scrollbar-hidden
+          "
+                >
+                    <div className="flex flex-col gap-4 md:flex-row md:gap-4 md:pb-2">
+                        {reviews.map((r, idx) => (
+                            <div
+                                key={idx}
+                                className="
+                  rounded-2xl border border-white/10 bg-white/5 p-6
+                  md:min-w-[360px] md:max-w-[360px]
+                "
+                            >
+                                <p className="text-sm leading-6 text-white/80">“{r.quote}”</p>
+                                <div className="mt-4 text-sm font-semibold">{r.name}</div>
+                                <div className="text-xs text-white/50">{r.meta}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Bouncing scroll hint arrow (desktop: right, mobile: down) */}
+                {showHint && (
+                    <>
+                        {/* Desktop (md+): right arrow */}
+                        <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 md:block">
+                            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/60 px-3 py-2 backdrop-blur">
+                                <span className="text-xs text-white/70">Scroll</span>
+                                <span className="animate-bounce-x text-white/80">→</span>
+                            </div>
+                        </div>
+
+                        {/* Mobile: down arrow */}
+                        <div className="pointer-events-none absolute bottom-2 left-1/2 block -translate-x-1/2 md:hidden">
+                            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/60 px-3 py-2 backdrop-blur">
+                                <span className="text-xs text-white/70">Scroll</span>
+                                <span className="animate-bounce text-white/80">↓</span>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
 
 export default function App() {
 
@@ -52,11 +206,11 @@ export default function App() {
                         {/* Nav (wraps to next line on medium screens) */}
                         <nav
                             className="
-        order-3 w-full
-        flex flex-wrap items-center gap-x-6 gap-y-3
-        text-sm text-white/70
-        md:order-none md:w-auto md:justify-end
-      "
+                                order-3 w-full justify-center
+                                flex flex-wrap items-center gap-x-6 gap-y-3
+                                text-sm text-white/70
+                                md:order-none md:w-auto
+                            "
                         >
                             <a className="hover:text-white" href="#how">How it works</a>
                             <a className="hover:text-white" href="#features">Features</a>
@@ -85,9 +239,9 @@ export default function App() {
                         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
                             <div>
                                 <div className="flex flex-wrap gap-2">
-                                    <Pill>No apps</Pill>
-                                    <Pill>No logins</Pill>
-                                    <Pill>QR or link</Pill>
+                                    <Pill>No Apps</Pill>
+                                    <Pill>No Logins</Pill>
+                                    <Pill>QR or Link</Pill>
                                 </div>
 
                                 <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -149,7 +303,7 @@ export default function App() {
                 </section>
 
                 {/* How it works */}
-                <section id="how" className="py-16">
+                <section id="how" className="py-10">
                     <Container>
                         <div className="flex items-end justify-between gap-6">
                             <div>
@@ -178,7 +332,7 @@ export default function App() {
                 </section>
 
                 {/* Features */}
-                <section id="features" className="py-16">
+                <section id="features" className="py-10">
                     <Container>
                         <h2 className="text-2xl font-semibold">Features</h2>
                         <p className="mt-2 text-sm text-white/70">
@@ -206,8 +360,20 @@ export default function App() {
                     </Container>
                 </section>
 
+                {/* Reviews */}
+                <section id="reviews" className="py-10">
+                    <Container>
+                        <h2 className="text-2xl font-semibold">What organisers say</h2>
+                        <p className="mt-2 text-sm text-white/70">
+                            Early feedback from planners and hosts using Stashed.
+                        </p>
+
+                        <ReviewsScroller />
+                    </Container>
+                </section>
+
                 {/* Use cases */}
-                <section id="use-cases" className="py-16">
+                <section id="use-cases" className="py-10">
                     <Container>
                         <h2 className="text-2xl font-semibold">Use cases</h2>
                         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -232,7 +398,7 @@ export default function App() {
                 </section>
 
                 {/* Contact / CTA */}
-                <section id="contact" className="py-16">
+                <section id="contact" className="py-10">
                     <Container>
                         <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
                             <h2 className="text-2xl font-semibold">Get early access</h2>
@@ -255,9 +421,9 @@ export default function App() {
                                 />
                                 <button
                                     type="submit"
-                                    className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
+                                    className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90 whitespace-nowrap"
                                 >
-                                    Notify me
+                                    Notify Me
                                 </button>
                             </form>
 
