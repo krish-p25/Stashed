@@ -350,38 +350,22 @@ export default function Home() {
                     </Container>
                 </section>
 
-                {/* Contact / CTA */}
-                <section id="contact" className="py-10">
+                {/* CTA */}
+                <section className="py-16">
                     <Container>
-                        <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-                            <h2 className="text-2xl font-semibold">Get early access</h2>
+                        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
+                            <h2 className="text-2xl font-semibold">Ready to try Stashed?</h2>
                             <p className="mt-2 text-sm text-white/70">
-                                Leave your email and we’ll message you when the first version is ready.
+                                Get early access and be one of the first to use Stashed for your events.
                             </p>
 
-                            <form
-                                className="mt-6 flex flex-col gap-3 sm:flex-row"
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    alert("Nice — wire this to your backend later.");
-                                }}
-                            >
-                                <input
-                                    type="email"
-                                    required
-                                    placeholder="Email address"
-                                    className="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/20"
-                                />
-                                <button
-                                    type="submit"
-                                    className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90 whitespace-nowrap"
+                            <div className="mt-6">
+                                <a
+                                    href="/contact"
+                                    className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                                 >
-                                    Notify Me
-                                </button>
-                            </form>
-
-                            <div className="mt-4 text-xs text-white/50">
-                                Or email: <span className="text-white/70">stashed@krishrp.xyz</span>
+                                    Get early access
+                                </a>
                             </div>
                         </div>
                     </Container>
