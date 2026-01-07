@@ -61,7 +61,7 @@ function CTA({ title, desc }) {
 
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                         <a
-                            href="/#contact"
+                            href="/contact"
                             className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                         >
                             Get early access
@@ -252,7 +252,7 @@ export default function UseCases() {
             <Header />
 
             {/* Hero */}
-            <section className="pt-14 pb-12">
+            <section className="py-4 lg:py-10">
                 <Container>
                     <div className="flex flex-wrap gap-2">
                         <Pill>Weddings</Pill>
@@ -272,7 +272,7 @@ export default function UseCases() {
 
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <a
-                            href="/#contact"
+                            href="/contact"
                             className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
                         >
                             Get early access
