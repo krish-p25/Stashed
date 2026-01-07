@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Features from "./pages/Features.jsx";
 import HowItWorks from "./pages/HowItWorks.jsx";
+import UseCases from "./pages/UseCases.jsx";
 
 export default function App() {
     return (
@@ -10,6 +11,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/features" element={<Features />} />
                 <Route path="/how-it-works" element={<HowItWorks />} />
+                <Route path="/use-cases" element={<UseCases />} />
 
                 {/* Temporary catch-all (optional but recommended) */}
                 <Route path="*" element={<Navigate to="/" replace />} />
