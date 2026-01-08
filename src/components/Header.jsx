@@ -25,11 +25,11 @@ export default function Header() {
                     {/* Nav */}
                     <nav
                         className="
-              order-3 w-full justify-center
-              flex flex-wrap items-center gap-x-6 gap-y-3
-              text-sm text-white/70
-              md:order-none md:w-auto
-            "
+                        order-3 w-full justify-center
+                        flex flex-wrap items-center gap-x-6 gap-y-3
+                        text-sm text-white/70
+                        md:order-none md:w-auto
+                        "
                     >
                         <a className="hover:text-white" href="/how-it-works">How it works</a>
                         <a className="hover:text-white" href="/features">Features</a>
