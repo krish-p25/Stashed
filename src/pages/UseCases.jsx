@@ -1,4 +1,5 @@
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Glow from "../components/Glow";
 
 function Container({ children }) {
@@ -7,7 +8,7 @@ function Container({ children }) {
 
 function Pill({ children }) {
     return (
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+        <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs text-violet-700">
             {children}
         </span>
     );
@@ -16,23 +17,23 @@ function Pill({ children }) {
 function SectionTitle({ title, desc }) {
     return (
         <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-semibold">{title}</h2>
-            {desc ? <p className="text-sm text-white/70">{desc}</p> : null}
+            <h2 className="text-2xl font-semibold text-zinc-900">{title}</h2>
+            {desc ? <p className="text-sm text-zinc-600">{desc}</p> : null}
         </div>
     );
 }
 
 function Card({ title, desc, bullets }) {
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h3 className="text-base font-semibold">{title}</h3>
-            <p className="mt-2 text-sm leading-6 text-white/70">{desc}</p>
+        <div className="rounded-2xl border border-violet-200/70 bg-white p-6 shadow-sm hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200">
+            <h3 className="text-base font-semibold text-zinc-900">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-zinc-700">{desc}</p>
 
             {bullets?.length ? (
-                <ul className="mt-4 space-y-2 text-sm text-white/70">
-                    {bullets.map((b) => (
-                        <li className="flex items-start gap-2">
-                            <span className="mt-2.25 h-1.5 w-1.5 shrink-0 rounded-full bg-white/40" />
+                <ul className="mt-4 space-y-2 text-sm text-zinc-700">
+                    {bullets.map((b, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
                             <span className="leading-6">{b}</span>
                         </li>
                     ))}
@@ -44,9 +45,9 @@ function Card({ title, desc, bullets }) {
 
 function MiniCard({ title, desc }) {
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <div className="text-sm font-semibold">{title}</div>
-            <div className="mt-2 text-sm leading-6 text-white/70">{desc}</div>
+        <div className="rounded-2xl border border-violet-200/70 bg-white p-5 shadow-sm hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200">
+            <div className="text-sm font-semibold text-zinc-900">{title}</div>
+            <div className="mt-2 text-sm leading-6 text-zinc-700">{desc}</div>
         </div>
     );
 }
@@ -55,20 +56,20 @@ function CTA({ title, desc }) {
     return (
         <section className="py-16">
             <Container>
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-                    <h2 className="text-2xl font-semibold">{title}</h2>
-                    <p className="mt-2 text-sm text-white/70">{desc}</p>
+                <div className="rounded-3xl border border-violet-200/70 bg-violet-50/60 p-8 text-center shadow-sm">
+                    <h2 className="text-2xl font-semibold text-zinc-900">{title}</h2>
+                    <p className="mt-2 text-sm text-zinc-700">{desc}</p>
 
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                         <a
                             href="/contact"
-                            className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
+                            className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
                         >
                             Get early access
                         </a>
                         <a
                             href="/features"
-                            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
+                            className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
                         >
                             Explore features
                         </a>
@@ -83,8 +84,7 @@ export default function UseCases() {
     const useCases = [
         {
             title: "Weddings",
-            desc:
-                "Collect every guest moment without chasing people after the day. One link, one place, everything organised.",
+            desc: "Collect every guest moment without chasing people after the day. One link, one place, everything organised.",
             bullets: [
                 "Print QR codes for tables, bar area, or photo booth",
                 "Optional moderation so nothing awkward appears publicly",
@@ -94,8 +94,7 @@ export default function UseCases() {
         },
         {
             title: "Wedding planners",
-            desc:
-                "Run multiple events with a consistent workflow. Keep media separated per client, and hand over a clean gallery after.",
+            desc: "Run multiple events with a consistent workflow. Keep media separated per client, and hand over a clean gallery after.",
             bullets: [
                 "Separate events per client, no mixing media",
                 "Share link/QR with venue staff and bridal party",
@@ -105,8 +104,7 @@ export default function UseCases() {
         },
         {
             title: "Corporate events",
-            desc:
-                "Centralise attendee content for internal recaps, marketing, and employer branding — without relying on group chats.",
+            desc: "Centralise attendee content for internal recaps, marketing, and employer branding — without relying on group chats.",
             bullets: [
                 "Collect social-friendly content from attendees",
                 "Keep everything in one folder-like gallery",
@@ -116,8 +114,7 @@ export default function UseCases() {
         },
         {
             title: "Conferences & talks",
-            desc:
-                "Capture attendee uploads, speaker highlights, and behind-the-scenes clips across multiple rooms and sessions.",
+            desc: "Capture attendee uploads, speaker highlights, and behind-the-scenes clips across multiple rooms and sessions.",
             bullets: [
                 "One QR per conference or per session (later: multi-QR)",
                 "Collect audience angles of key moments",
@@ -127,8 +124,7 @@ export default function UseCases() {
         },
         {
             title: "Parties & birthdays",
-            desc:
-                "Stop losing memories in 10 different chats. Guests upload in one place and you keep the best bits forever.",
+            desc: "Stop losing memories in 10 different chats. Guests upload in one place and you keep the best bits forever.",
             bullets: [
                 "Ideal for big birthday parties and anniversaries",
                 "Guests upload instantly (no reminders needed)",
@@ -138,8 +134,7 @@ export default function UseCases() {
         },
         {
             title: "Festivals & ticketed events",
-            desc:
-                "Let attendees contribute content while you keep control. Great for community events and brand activations.",
+            desc: "Let attendees contribute content while you keep control. Great for community events and brand activations.",
             bullets: [
                 "Collect UGC at scale with a simple flow",
                 "Add moderation controls if you want a public gallery",
@@ -149,8 +144,7 @@ export default function UseCases() {
         },
         {
             title: "School & community events",
-            desc:
-                "Centralise photos from parents and volunteers with clear boundaries and privacy controls.",
+            desc: "Centralise photos from parents and volunteers with clear boundaries and privacy controls.",
             bullets: [
                 "Share QR at the entrance or in newsletters",
                 "Optional PIN to control access",
@@ -160,8 +154,7 @@ export default function UseCases() {
         },
         {
             title: "Sports teams & tournaments",
-            desc:
-                "Gather photos and clips from different viewpoints — players, parents, coaches — into one organised place.",
+            desc: "Gather photos and clips from different viewpoints — players, parents, coaches — into one organised place.",
             bullets: [
                 "One place for matchday photos/videos",
                 "Collect highlights across multiple games",
@@ -172,22 +165,10 @@ export default function UseCases() {
     ];
 
     const whyPeopleUseIt = [
-        {
-            title: "No app installs",
-            desc: "Guests are far more likely to upload when it’s a link + picker. Reduce drop-off immediately.",
-        },
-        {
-            title: "Everything in one place",
-            desc: "Stop losing media across WhatsApp, iMessage, and random Drive links.",
-        },
-        {
-            title: "Organiser control",
-            desc: "Moderate uploads, feature favourites, and export clean downloads after the event.",
-        },
-        {
-            title: "Works for big groups",
-            desc: "Designed for events with lots of guests and lots of devices — without chaos.",
-        },
+        { title: "No app installs",        desc: "Guests are far more likely to upload when it's a link + picker. Reduce drop-off immediately." },
+        { title: "Everything in one place", desc: "Stop losing media across WhatsApp, iMessage, and random Drive links." },
+        { title: "Organiser control",       desc: "Moderate uploads, feature favourites, and export clean downloads after the event." },
+        { title: "Works for big groups",    desc: "Designed for events with lots of guests and lots of devices — without chaos." },
     ];
 
     const comparison = [
@@ -207,7 +188,7 @@ export default function UseCases() {
             bullets: [
                 "Guests often need accounts/logins",
                 "Uploads on mobile are clunky",
-                "People don’t know what folder to use",
+                "People don't know what folder to use",
                 "Low participation without constant reminders",
             ],
         },
@@ -226,33 +207,29 @@ export default function UseCases() {
     const playbooks = [
         {
             title: "Wedding table QR playbook",
-            desc:
-                "Print a QR code for each table. Add a short line: “Upload your best photos from today.” You’ll get candid moments you’d never see otherwise.",
+            desc: `Print a QR code for each table. Add a short line: "Upload your best photos from today." You'll get candid moments you'd never see otherwise.`,
         },
         {
             title: "Corporate event recap playbook",
-            desc:
-                "Share the link in the event agenda / Slack channel. After the event, export the best clips and give marketing a ready-to-go content folder.",
+            desc: `Share the link in the event agenda / Slack channel. After the event, export the best clips and give marketing a ready-to-go content folder.`,
         },
         {
             title: "Conference session playbook",
-            desc:
-                "Place a QR slide at the end of each talk. Attendees upload audience photos and short clips; you build a sponsor-ready highlight set fast.",
+            desc: `Place a QR slide at the end of each talk. Attendees upload audience photos and short clips; you build a sponsor-ready highlight set fast.`,
         },
         {
             title: "Birthday party playbook",
-            desc:
-                "Put the QR on a sign near the entrance and in the WhatsApp invite. Guests upload during the night; you wake up with everything in one place.",
+            desc: `Put the QR on a sign near the entrance and in the WhatsApp invite. Guests upload during the night; you wake up with everything in one place.`,
         },
     ];
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white">
+        <div className="min-h-screen text-zinc-900">
             <Glow />
             <Header />
 
             {/* Hero */}
-            <section className="py-4 lg:py-10">
+            <section className="pt-24 pb-4 lg:pt-28 lg:pb-10">
                 <Container>
                     <div className="flex flex-wrap gap-2">
                         <Pill>Weddings</Pill>
@@ -265,7 +242,7 @@ export default function UseCases() {
                     <h1 className="mt-5 text-4xl font-semibold tracking-tight">
                         Use cases for collecting event photos & videos
                     </h1>
-                    <p className="mt-4 max-w-3xl text-lg text-white/70">
+                    <p className="mt-4 max-w-3xl text-lg text-zinc-700">
                         Stashed is designed for events with lots of guests and lots of moments.
                         It works anywhere you need a simple upload flow, a clean gallery, and organiser control.
                     </p>
@@ -273,13 +250,13 @@ export default function UseCases() {
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <a
                             href="/contact"
-                            className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
+                            className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
                         >
                             Get early access
                         </a>
                         <a
                             href="/how-it-works"
-                            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
+                            className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
                         >
                             How it works
                         </a>
@@ -309,7 +286,6 @@ export default function UseCases() {
                         title="Use cases"
                         desc="Choose your scenario — the workflow stays the same: share → collect → review → download."
                     />
-
                     <div className="mt-8 grid gap-4 md:grid-cols-2">
                         {useCases.map((u, i) => (
                             <Card key={i} title={u.title} desc={u.desc} bullets={u.bullets} />
@@ -325,7 +301,6 @@ export default function UseCases() {
                         title="Quick playbooks"
                         desc="Simple ways to get the highest guest participation with almost zero effort."
                     />
-
                     <div className="mt-8 grid gap-4 md:grid-cols-2">
                         {playbooks.map((p, i) => (
                             <Card key={i} title={p.title} desc={p.desc} />
@@ -339,16 +314,14 @@ export default function UseCases() {
                 <Container>
                     <SectionTitle
                         title="Stashed vs common alternatives"
-                        desc="Most people start with WhatsApp or a Drive link. Here’s why those break down at scale."
+                        desc="Most people start with WhatsApp or a Drive link. Here's why those break down at scale."
                     />
-
                     <div className="mt-8 grid gap-4 md:grid-cols-3">
                         {comparison.map((c, i) => (
                             <Card key={i} title={c.title} desc={c.desc} bullets={c.bullets} />
                         ))}
                     </div>
-
-                    <div className="mt-6 text-xs text-white/50">
+                    <div className="mt-6 text-xs text-zinc-500">
                         Stashed is designed to maximise participation (no logins) while keeping organisers in control (review & download).
                     </div>
                 </Container>
@@ -358,6 +331,7 @@ export default function UseCases() {
                 title="Want Stashed for your event?"
                 desc="Get early access and be one of the first to use Stashed for weddings, corporate events, parties, and beyond."
             />
+            <Footer />
         </div>
     );
 }

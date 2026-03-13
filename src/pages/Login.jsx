@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Glow from "../components/Glow";
 
 function Container({ children }) {
@@ -32,18 +33,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            // TODO: wire to your API later:
-            // const res = await fetch("/api/auth/login", {
-            //   method: "POST",
-            //   headers: { "Content-Type": "application/json" },
-            //   body: JSON.stringify({ email, password, remember }),
-            // });
-            // if (!res.ok) throw new Error("Invalid login.");
-            // const data = await res.json();
-
-            // For now, stub success if both fields filled
             if (!email || !password) throw new Error("Please enter your email and password.");
-
             setStatus({ type: "success", message: "Logged in (stub). API wiring next." });
         } catch (err) {
             setStatus({ type: "error", message: err?.message || "Login failed." });
@@ -53,43 +43,42 @@ export default function Login() {
     }
 
     useEffect(() => {
-        // catches browser/password-manager autofill on page load
         const t = setTimeout(() => {
             const emailEl = document.querySelector('input[type="email"]');
-            const passEl = document.querySelector('input[type="password"]');
+            const passEl  = document.querySelector('input[type="password"]');
             if (emailEl?.value) setEmail(emailEl.value);
-            if (passEl?.value) setPassword(passEl.value);
+            if (passEl?.value)  setPassword(passEl.value);
         }, 50);
-
         return () => clearTimeout(t);
     }, []);
 
+    const inputClass = "mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-500 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-colors";
+
     return (
-        <div className="min-h-screen bg-zinc-950 text-white">
+        <div className="min-h-screen text-zinc-900">
             <Glow />
             <Header />
 
-            <main className="pt-10 pb-16 sm:pt-14">
+            <main className="pt-24 pb-16 sm:pt-28">
                 <Container>
                     <div className="mx-auto max-w-xl">
-                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
+                        <div className="rounded-2xl border border-violet-200/70 bg-white p-6 sm:p-8 shadow-md shadow-violet-100/30">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-sm text-white/60">Early access</p>
-                                    <h1 className="mt-2 text-3xl font-semibold tracking-tight">Log in</h1>
-                                    
+                                    <p className="text-sm text-zinc-500">Early access</p>
+                                    <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">Log in</h1>
                                 </div>
-                                <div className="hidden sm:block rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/70 whitespace-nowrap">
+                                <div className="hidden sm:block rounded-2xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-600 whitespace-nowrap">
                                     Members only
                                 </div>
                             </div>
-                            <p className="mt-2 text-sm text-white/70 leading-6 w-full">
-                                If you’ve been granted early access, use your credentials to sign in.
+                            <p className="mt-2 text-sm text-zinc-600 leading-6">
+                                If you've been granted early access, use your credentials to sign in.
                             </p>
 
                             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                                 <div>
-                                    <label className="text-sm text-white/70">Email</label>
+                                    <label className="text-sm text-zinc-700">Email</label>
                                     <input
                                         type="email"
                                         autoComplete="email"
@@ -97,19 +86,17 @@ export default function Login() {
                                         onChange={syncEmail}
                                         onInput={syncEmail}
                                         placeholder="you@company.com"
-                                        className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/60 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/25"
+                                        className={inputClass}
                                     />
                                 </div>
 
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <label className="text-sm text-white/70">Password</label>
+                                        <label className="text-sm text-zinc-700">Password</label>
                                         <button
                                             type="button"
-                                            className="text-xs text-white/60 hover:text-white/80"
-                                            onClick={() =>
-                                                setStatus({ type: "info", message: "Password reset flow coming soon." })
-                                            }
+                                            className="text-xs text-zinc-500 hover:text-zinc-700 transition-colors"
+                                            onClick={() => setStatus({ type: "info", message: "Password reset flow coming soon." })}
                                         >
                                             Forgot password?
                                         </button>
@@ -121,22 +108,21 @@ export default function Login() {
                                         onChange={syncPassword}
                                         onInput={syncPassword}
                                         placeholder="••••••••"
-                                        className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/60 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/25"
+                                        className={inputClass}
                                     />
                                 </div>
 
                                 <div className="flex items-center justify-between gap-4">
-                                    <label className="flex items-center gap-2 text-sm text-white/70">
+                                    <label className="flex items-center gap-2 text-sm text-zinc-700">
                                         <input
                                             type="checkbox"
                                             checked={remember}
                                             onChange={(e) => setRemember(e.target.checked)}
-                                            className="h-4 w-4 rounded border-white/20 bg-white/5"
+                                            className="h-4 w-4 rounded border-zinc-300 accent-violet-600"
                                         />
                                         Remember me
                                     </label>
-
-                                    <Link to="/contact" className="text-sm text-white/60 hover:text-white/80">
+                                    <Link to="/contact" className="text-sm text-violet-600 hover:text-violet-700 transition-colors">
                                         Need access?
                                     </Link>
                                 </div>
@@ -146,10 +132,10 @@ export default function Login() {
                                         className={[
                                             "rounded-xl border px-4 py-3 text-sm",
                                             status.type === "success"
-                                                ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-200"
+                                                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                                                 : status.type === "info"
-                                                    ? "border-sky-500/20 bg-sky-500/10 text-sky-200"
-                                                    : "border-rose-500/20 bg-rose-500/10 text-rose-200",
+                                                    ? "border-sky-200 bg-sky-50 text-sky-700"
+                                                    : "border-rose-200 bg-rose-50 text-rose-700",
                                         ].join(" ")}
                                     >
                                         {status.message}
@@ -162,15 +148,14 @@ export default function Login() {
                                     className={[
                                         "w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all",
                                         isReady && !loading
-                                            ? "bg-white text-zinc-950 hover:bg-white/90"
-                                            : "bg-white/10 text-white/40 cursor-not-allowed hover:bg-white/10",
+                                            ? "bg-violet-600 text-white hover:bg-violet-700"
+                                            : "bg-zinc-100 text-zinc-500 cursor-not-allowed",
                                     ].join(" ")}
                                 >
                                     {loading ? "Signing in…" : "Sign in"}
                                 </button>
 
-
-                                <p className="text-xs text-white/50 leading-5">
+                                <p className="text-xs text-zinc-500 leading-5">
                                     By signing in you agree to keep early access features confidential while we iterate.
                                 </p>
                             </form>
@@ -178,6 +163,7 @@ export default function Login() {
                     </div>
                 </Container>
             </main>
+            <Footer />
         </div>
     );
 }

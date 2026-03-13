@@ -6,46 +6,25 @@ body,
   height: 100%;
 }
 
+body {
+  background: white;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border: 1px solid transparent;
-  font-size: 1em;
-  font-family: inherit;
-  cursor: pointer;
+  text-rendering: optimizeLegibility;
 }
 
 @keyframes bounce-x {
-
   0%,
   100% {
     transform: translateX(0);
   }
-
   50% {
     transform: translateX(8px);
   }
@@ -57,20 +36,32 @@ button {
 
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+
+@keyframes glow-drift-a {
+  0%,  100% { transform: translate(0,    0)    scale(1);    }
+  25%        { transform: translate(24px, -18px) scale(1.04); }
+  50%        { transform: translate(-12px, 14px) scale(0.97); }
+  75%        { transform: translate(14px,  24px) scale(1.02); }
+}
+
+@keyframes glow-drift-b {
+  0%,  100% { transform: translate(0,    0)    scale(1);    }
+  33%        { transform: translate(-28px, 16px) scale(1.05); }
+  66%        { transform: translate(18px, -22px) scale(0.96); }
+}
+
+@keyframes glow-drift-c {
+  0%,  100% { transform: translate(0,    0)    scale(1);    }
+  40%        { transform: translate(18px,  28px) scale(1.06); }
+  80%        { transform: translate(-14px,-10px) scale(0.95); }
+}
+
+.animate-glow-a { animation: glow-drift-a 22s ease-in-out infinite; }
+.animate-glow-b { animation: glow-drift-b 28s ease-in-out infinite; }
+.animate-glow-c { animation: glow-drift-c 18s ease-in-out infinite; }

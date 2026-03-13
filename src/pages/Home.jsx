@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Glow from "../components/Glow";
 
 function Container({ children }) {
@@ -8,7 +9,7 @@ function Container({ children }) {
 
 function Pill({ children }) {
     return (
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+        <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs text-violet-700">
             {children}
         </span>
     );
@@ -16,9 +17,9 @@ function Pill({ children }) {
 
 function Card({ title, desc }) {
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-white">{title}</h3>
-            <p className="mt-2 text-sm leading-6 text-white/70">{desc}</p>
+        <div className="rounded-2xl border border-violet-200/70 bg-white p-6 shadow-sm hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200">
+            <h3 className="text-base font-semibold text-zinc-900">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-zinc-700">{desc}</p>
         </div>
     );
 }
@@ -28,7 +29,7 @@ function ReviewsScroller() {
     const [showHint, setShowHint] = useState(false);
     const hideTimerRef = useRef(null);
 
-    const isMobile = () => window.matchMedia("(max-width: 767px)").matches; // < md
+    const isMobile = () => window.matchMedia("(max-width: 767px)").matches;
 
     const updateHint = useCallback(() => {
         const el = scrollerRef.current;
@@ -47,18 +48,12 @@ function ReviewsScroller() {
         const el = scrollerRef.current;
         if (!el) return;
 
-        // Initial check after layout
         const raf = requestAnimationFrame(updateHint);
 
         const onScroll = () => {
-            // Hide immediately while scrolling
             setShowHint(false);
-
-            // When scrolling stops, show again unless at end
             if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-            hideTimerRef.current = setTimeout(() => {
-                updateHint();
-            }, 160);
+            hideTimerRef.current = setTimeout(() => { updateHint(); }, 160);
         };
 
         const onResize = () => updateHint();
@@ -76,44 +71,37 @@ function ReviewsScroller() {
 
     const reviews = [
         {
-            quote:
-                "We used Stashed at our wedding and it was a game-changer. Everyone uploaded instantly and we had everything in one place the next day.",
+            quote: "We used Stashed at our wedding and it was a game-changer. Everyone uploaded instantly and we had everything in one place the next day.",
             name: "Sarah & Tom",
             meta: "Wedding, London",
         },
         {
-            quote:
-                "Perfect for corporate events. No chasing people for photos — the QR code did all the work.",
+            quote: "Perfect for corporate events. No chasing people for photos — the QR code did all the work.",
             name: "Mahesh Patel",
             meta: "Event Manager",
         },
         {
-            quote:
-                "Clean, simple, and exactly what guests want. We now use Stashed for every client event.",
+            quote: "Clean, simple, and exactly what guests want. We now use Stashed for every client event.",
             name: "Amelia Rhodes",
             meta: "Wedding Planner",
         },
         {
-            quote:
-                "The gallery felt premium and the admin controls were simple. Clients love the after-event download.",
+            quote: "The gallery felt premium and the admin controls were simple. Clients love the after-event download.",
             name: "Maya S.",
             meta: "Event Coordinator",
         },
         {
-            quote:
-                "Guests actually used it. That’s the biggest win — no app installs and no friction.",
+            quote: "Guests actually used it. That's the biggest win — no app installs and no friction.",
             name: "Ollie K.",
             meta: "Birthday Host",
         },
         {
-            quote:
-                "We printed the QR codes for tables and the uploads just flowed in. Brilliant for candid moments.",
+            quote: "We printed the QR codes for tables and the uploads just flowed in. Brilliant for candid moments.",
             name: "Hannah & Imran",
             meta: "Wedding, Manchester",
         },
         {
-            quote:
-                "For conferences, it’s a great way to collect attendee content and speaker highlights in one place.",
+            quote: "For conferences, it's a great way to collect attendee content and speaker highlights in one place.",
             name: "Daniel W.",
             meta: "Conference Organiser",
         },
@@ -121,50 +109,41 @@ function ReviewsScroller() {
 
     return (
         <div className="mt-8">
-            {/* Relative wrapper so we can overlay the arrow */}
             <div className="relative">
                 <div
                     ref={scrollerRef}
                     className="
-            max-h-[420px] overflow-y-auto pr-1
-            md:max-h-none md:overflow-y-hidden md:overflow-x-auto md:pr-0
-            scroll-smooth
-            md:scrollbar-hidden
-          "
+                        max-h-[420px] overflow-y-auto pr-1
+                        md:max-h-none md:overflow-y-hidden md:overflow-x-auto md:pr-0
+                        scroll-smooth md:scrollbar-hidden
+                    "
                 >
                     <div className="flex flex-col gap-4 md:flex-row md:gap-4 md:pb-2">
                         {reviews.map((r, idx) => (
                             <div
                                 key={idx}
-                                className="
-                  rounded-2xl border border-white/10 bg-white/5 p-6
-                  md:min-w-[360px] md:max-w-[360px]
-                "
+                                className="rounded-2xl border border-violet-100 bg-white p-6 shadow-sm md:min-w-[360px] md:max-w-[360px]"
                             >
-                                <p className="text-sm leading-6 text-white/80">“{r.quote}”</p>
-                                <div className="mt-4 text-sm font-semibold">{r.name}</div>
-                                <div className="text-xs text-white/50">{r.meta}</div>
+                                <p className="text-sm leading-6 text-zinc-700">"{r.quote}"</p>
+                                <div className="mt-4 text-sm font-semibold text-zinc-900">{r.name}</div>
+                                <div className="text-xs text-zinc-500">{r.meta}</div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Bouncing scroll hint arrow (desktop: right, mobile: down) */}
                 {showHint && (
                     <>
-                        {/* Desktop (md+): right arrow */}
                         <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 md:block">
-                            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/60 px-3 py-2 backdrop-blur">
-                                <span className="text-xs text-white/70">Scroll</span>
-                                <span className="animate-bounce-x text-white/80">→</span>
+                            <div className="flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3 py-2 shadow-sm">
+                                <span className="text-xs text-zinc-600">Scroll</span>
+                                <span className="animate-bounce-x text-violet-600">→</span>
                             </div>
                         </div>
-
-                        {/* Mobile: down arrow */}
                         <div className="pointer-events-none absolute bottom-2 left-1/2 block -translate-x-1/2 md:hidden">
-                            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/60 px-3 py-2 backdrop-blur">
-                                <span className="text-xs text-white/70">Scroll</span>
-                                <span className="animate-bounce text-white/80">↓</span>
+                            <div className="flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3 py-2 shadow-sm">
+                                <span className="text-xs text-zinc-600">Scroll</span>
+                                <span className="animate-bounce text-violet-600">↓</span>
                             </div>
                         </div>
                     </>
@@ -176,18 +155,14 @@ function ReviewsScroller() {
 
 
 export default function Home() {
-
     return (
-        <div className="min-h-screen bg-zinc-950 text-white">
-            {/* Top background glow */}
+        <div className="min-h-screen text-zinc-900">
             <Glow />
-
-            {/* Nav */}
             <Header />
 
-            {/* Hero */}
             <main className="relative">
-                <section className="pt-10 pb-16 sm:pt-14">
+                {/* Hero */}
+                <section className="pt-24 pb-16 sm:pt-28">
                     <Container>
                         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
                             <div>
@@ -201,7 +176,7 @@ export default function Home() {
                                     Collect event photos & videos in one place.
                                 </h1>
 
-                                <p className="mt-4 text-base leading-7 text-white/70 sm:text-lg">
+                                <p className="mt-4 text-base leading-7 text-zinc-700 sm:text-lg">
                                     Stashed gives you a simple event page. Share a QR code or link, guests upload instantly, and you can
                                     review and download everything after.
                                 </p>
@@ -209,45 +184,41 @@ export default function Home() {
                                 <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                                     <a
                                         href="contact"
-                                        className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
+                                        className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
                                     >
                                         Get early access
                                     </a>
                                     <a
                                         href="how-it-works"
-                                        className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
+                                        className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
                                     >
                                         See how it works
                                     </a>
                                 </div>
 
-                                <div className="mt-6 text-xs text-white/50">
+                                <div className="mt-6 text-xs text-zinc-500">
                                     Built for weddings, parties, corporate events, conferences, and organisers managing multiple events.
                                 </div>
                             </div>
 
                             {/* Mock preview */}
-                            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm">
+                            <div className="rounded-3xl border border-violet-200/70 bg-white p-6 shadow-md shadow-violet-100/40">
                                 <div className="flex items-center justify-between">
-                                    <div className="text-sm font-semibold">Event gallery preview</div>
-                                    <span className="text-xs text-white/60">Live-style demo</span>
+                                    <div className="text-sm font-semibold text-zinc-900">Event gallery preview</div>
+                                    <span className="text-xs text-zinc-500">Live-style demo</span>
                                 </div>
 
                                 <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
                                     {Array.from({ length: 12 }).map((_, i) => (
-                                        <div
-                                            key={i}
-                                            className="aspect-square rounded-2xl bg-white/10"
-                                            aria-hidden="true"
-                                        />
+                                        <div key={i} className="aspect-square rounded-2xl bg-violet-100" aria-hidden="true" />
                                     ))}
                                 </div>
 
                                 <div className="mt-5 flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-2xl bg-white/10" />
+                                    <div className="h-10 w-10 rounded-2xl bg-violet-100 shrink-0" />
                                     <div className="min-w-0">
-                                        <div className="text-sm font-semibold">Guests upload from their phone</div>
-                                        <div className="text-xs text-white/60">QR → upload → appears in your dashboard</div>
+                                        <div className="text-sm font-semibold text-zinc-900">Guests upload from their phone</div>
+                                        <div className="text-xs text-zinc-500">QR → upload → appears in your dashboard</div>
                                     </div>
                                 </div>
                             </div>
@@ -258,28 +229,15 @@ export default function Home() {
                 {/* How it works */}
                 <section id="how" className="py-10">
                     <Container>
-                        <div className="flex items-end justify-between gap-6">
-                            <div>
-                                <h2 className="text-2xl font-semibold">How it works</h2>
-                                <p className="mt-2 text-sm text-white/70">
-                                    Keep it simple for guests. Keep it controlled for hosts.
-                                </p>
-                            </div>
-                        </div>
+                        <h2 className="text-2xl font-semibold">How it works</h2>
+                        <p className="mt-2 text-sm text-zinc-600">
+                            Keep it simple for guests. Keep it controlled for hosts.
+                        </p>
 
                         <div className="mt-8 grid gap-4 md:grid-cols-3">
-                            <Card
-                                title="1) Create an event"
-                                desc="Make an event page in seconds. Set a name, optional PIN, and upload limits."
-                            />
-                            <Card
-                                title="2) Share a QR code or link"
-                                desc="Print a QR for tables or share the link in WhatsApp. Guests don’t need an app."
-                            />
-                            <Card
-                                title="3) Review & download"
-                                desc="Approve, hide, or feature uploads. Download everything after the event."
-                            />
+                            <Card title="1) Create an event"       desc="Make an event page in seconds. Set a name, optional PIN, and upload limits." />
+                            <Card title="2) Share a QR code or link" desc="Print a QR for tables or share the link in WhatsApp. Guests don't need an app." />
+                            <Card title="3) Review & download"     desc="Approve, hide, or feature uploads. Download everything after the event." />
                         </div>
                     </Container>
                 </section>
@@ -288,27 +246,15 @@ export default function Home() {
                 <section id="features" className="py-10">
                     <Container>
                         <h2 className="text-2xl font-semibold">Features</h2>
-                        <p className="mt-2 text-sm text-white/70">
+                        <p className="mt-2 text-sm text-zinc-600">
                             Built for organisers who want a clean guest experience and full control.
                         </p>
 
                         <div className="mt-8 grid gap-4 md:grid-cols-2">
-                            <Card
-                                title="Guest-first uploads"
-                                desc="Mobile-friendly uploader, simple flow, and fast uploads. No sign-ups."
-                            />
-                            <Card
-                                title="Moderation controls"
-                                desc="Approve uploads before they appear in a public gallery (optional)."
-                            />
-                            <Card
-                                title="After-event downloads"
-                                desc="Export everything at once (zip), or download in batches."
-                            />
-                            <Card
-                                title="Planner-ready"
-                                desc="Run multiple events, keep things organised, and share clean galleries with clients."
-                            />
+                            <Card title="Guest-first uploads"   desc="Mobile-friendly uploader, simple flow, and fast uploads. No sign-ups." />
+                            <Card title="Moderation controls"   desc="Approve uploads before they appear in a public gallery (optional)." />
+                            <Card title="After-event downloads" desc="Export everything at once (zip), or download in batches." />
+                            <Card title="Planner-ready"         desc="Run multiple events, keep things organised, and share clean galleries with clients." />
                         </div>
                     </Container>
                 </section>
@@ -317,10 +263,9 @@ export default function Home() {
                 <section id="reviews" className="py-10">
                     <Container>
                         <h2 className="text-2xl font-semibold">What organisers say</h2>
-                        <p className="mt-2 text-sm text-white/70">
+                        <p className="mt-2 text-sm text-zinc-600">
                             Early feedback from planners and hosts using Stashed.
                         </p>
-
                         <ReviewsScroller />
                     </Container>
                 </section>
@@ -330,21 +275,21 @@ export default function Home() {
                     <Container>
                         <h2 className="text-2xl font-semibold">Use cases</h2>
                         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                                <div className="text-sm font-semibold">Weddings</div>
-                                <div className="mt-2 text-sm text-white/70">Collect guest moments without chasing uploads.</div>
+                            <div className="rounded-2xl border border-violet-200/70 bg-white p-5 shadow-sm hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200">
+                                <div className="text-sm font-semibold text-zinc-900">Weddings</div>
+                                <div className="mt-2 text-sm text-zinc-700">Collect guest moments without chasing uploads.</div>
                             </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                                <div className="text-sm font-semibold">Corporate events</div>
-                                <div className="mt-2 text-sm text-white/70">Centralise media for internal recap + socials.</div>
+                            <div className="rounded-2xl border border-violet-200/70 bg-white p-5 shadow-sm hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200">
+                                <div className="text-sm font-semibold text-zinc-900">Corporate events</div>
+                                <div className="mt-2 text-sm text-zinc-700">Centralise media for internal recap + socials.</div>
                             </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                                <div className="text-sm font-semibold">Parties</div>
-                                <div className="mt-2 text-sm text-white/70">One link everyone can use—no group chats needed.</div>
+                            <div className="rounded-2xl border border-violet-200/70 bg-white p-5 shadow-sm hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200">
+                                <div className="text-sm font-semibold text-zinc-900">Parties</div>
+                                <div className="mt-2 text-sm text-zinc-700">One link everyone can use—no group chats needed.</div>
                             </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                                <div className="text-sm font-semibold">Conferences</div>
-                                <div className="mt-2 text-sm text-white/70">Capture attendee uploads and speaker highlights.</div>
+                            <div className="rounded-2xl border border-violet-200/70 bg-white p-5 shadow-sm hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200">
+                                <div className="text-sm font-semibold text-zinc-900">Conferences</div>
+                                <div className="mt-2 text-sm text-zinc-700">Capture attendee uploads and speaker highlights.</div>
                             </div>
                         </div>
                     </Container>
@@ -353,16 +298,15 @@ export default function Home() {
                 {/* CTA */}
                 <section className="py-16">
                     <Container>
-                        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-                            <h2 className="text-2xl font-semibold">Ready to try Stashed?</h2>
-                            <p className="mt-2 text-sm text-white/70">
+                        <div className="rounded-3xl border border-violet-200/70 bg-violet-50/60 p-8 text-center shadow-sm">
+                            <h2 className="text-2xl font-semibold text-zinc-900">Ready to try Stashed?</h2>
+                            <p className="mt-2 text-sm text-zinc-700">
                                 Get early access and be one of the first to use Stashed for your events.
                             </p>
-
                             <div className="mt-6">
                                 <a
                                     href="/contact"
-                                    className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-white/90"
+                                    className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
                                 >
                                     Get early access
                                 </a>
@@ -371,15 +315,7 @@ export default function Home() {
                     </Container>
                 </section>
 
-                {/* Footer */}
-                <footer className="border-t border-white/10 py-10">
-                    <Container>
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="text-sm text-white/60">© {new Date().getFullYear()} Stashed</div>
-                            <div className="text-xs text-white/50">Media collection for events.</div>
-                        </div>
-                    </Container>
-                </footer>
+                <Footer />
             </main>
         </div>
     );
