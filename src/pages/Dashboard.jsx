@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
 import { useAuth } from "../context/AuthContext";
@@ -10,6 +10,10 @@ function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
 }
 
+function fmtStatus(s) {
+    return s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
 const STATUS_STYLES = {
     active:        "border-emerald-200 bg-emerald-50 text-emerald-700",
     closed:        "border-zinc-200 bg-zinc-100 text-zinc-500",
@@ -17,18 +21,18 @@ const STATUS_STYLES = {
     pending_drive: "border-violet-200 bg-violet-50 text-violet-600",
 };
 
-function EventCard({ event }) {
+function EventCard({ event, onClick }) {
     return (
-        <Link
-            to={`/dashboard/events/${event.id}`}
-            className="group flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:border-violet-300 hover:shadow-md transition-all"
+        <div
+            onClick={onClick}
+            className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:border-violet-300 hover:shadow-md transition-all"
         >
             <div className="flex items-start justify-between gap-2">
                 <h3 className="text-sm font-semibold text-zinc-900 group-hover:text-violet-700 transition-colors leading-snug">
                     {event.title}
                 </h3>
                 <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[event.status] ?? STATUS_STYLES.closed}`}>
-                    {event.status}
+                    {fmtStatus(event.status)}
                 </span>
             </div>
 
@@ -40,7 +44,7 @@ function EventCard({ event }) {
                 <span>{event.uploadCount} {event.uploadCount === 1 ? "upload" : "uploads"}</span>
                 <span>{new Date(event.createdAt).toLocaleDateString()}</span>
             </div>
-        </Link>
+        </div>
     );
 }
 
@@ -51,7 +55,13 @@ export default function Dashboard() {
     const [data,    setData]    = useState(null);
     const [loading, setLoading] = useState(true);
     const [error,   setError]   = useState(null);
-    const [visible, setVisible] = useState(false);
+    const [visible,    setVisible]    = useState(false);
+    const [fadingOut,  setFadingOut]  = useState(false);
+
+    function navigateTo(path) {
+        setFadingOut(true);
+        setTimeout(() => navigate(path), 300);
+    }
 
     useEffect(() => {
         const id = requestAnimationFrame(() => setVisible(true));
@@ -82,7 +92,7 @@ export default function Dashboard() {
     }, []);
 
     return (
-        <div className={`min-h-screen text-zinc-900 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}>
+        <div className={`min-h-screen text-zinc-900 transition-opacity duration-300 ${visible && !fadingOut ? "opacity-100" : "opacity-0"}`}>
             <Glow />
             <Header />
 
@@ -119,7 +129,7 @@ export default function Dashboard() {
                                 <div className="flex items-center justify-between mb-5">
                                     <h2 className="text-xl font-semibold text-zinc-900">Your events</h2>
                                     <button
-                                        onClick={() => navigate("/dashboard/events/new")}
+                                        onClick={() => navigateTo("/dashboard/events/new")}
                                         className="cursor-pointer rounded-xl border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 hover:bg-violet-100 transition-colors"
                                     >
                                         + New event
@@ -134,7 +144,7 @@ export default function Dashboard() {
                                 ) : (
                                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                         {data.events.map((ev) => (
-                                            <EventCard key={ev.id} event={ev} />
+                                            <EventCard key={ev.id} event={ev} onClick={() => navigateTo(`/dashboard/events/${ev.id}`)} />
                                         ))}
                                     </div>
                                 )}
