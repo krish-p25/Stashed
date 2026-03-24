@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
-    const [scrolled, setScrolled] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
+    const [scrolled,  setScrolled]  = useState(false);
+    const [menuOpen,  setMenuOpen]  = useState(false);
     const { pathname } = useLocation();
+    const navigate     = useNavigate();
+    const { token, user, logout } = useAuth();
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 50);
@@ -16,18 +19,27 @@ export default function Header() {
         setMenuOpen(false);
     }, [pathname]);
 
-    const navLinks = [
+    function handleLogout() {
+        logout();
+        navigate("/login");
+    }
+
+    const guestLinks = [
         { href: "/how-it-works", label: "How it works" },
         { href: "/features",     label: "Features"     },
         { href: "/use-cases",    label: "Use cases"    },
         { href: "/login",        label: "Log in"       },
     ];
 
-    return (
-        /* Fixed full-width transparent rail — never blocks clicks */
-        <div className="fixed inset-x-0 top-0 z-50 pointer-events-none">
+    const authedLinks = [
+        { href: "/dashboard",            label: "Dashboard"  },
+        { href: "/dashboard/events/new", label: "New Event"  },
+    ];
 
-            {/* Island wrapper — animates margin-top and max-width */}
+    const navLinks = token ? authedLinks : guestLinks;
+
+    return (
+        <div className="fixed inset-x-0 top-0 z-50 pointer-events-none">
             <div
                 className={`pointer-events-auto mx-auto transition-all duration-300 ease-linear ${
                     scrolled
@@ -35,7 +47,6 @@ export default function Header() {
                         : "mt-0 max-w-[100vw] px-0"
                 }`}
             >
-                {/* Island body — animates shape, shadow, border */}
                 <div
                     className={`transition-all duration-300 ease-linear ${
                         scrolled
@@ -73,22 +84,34 @@ export default function Header() {
                                     {label}
                                 </a>
                             ))}
-                            <a
-                                href="/contact"
-                                className="ml-3 inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
-                            >
-                                Get early access
-                            </a>
+
+                            {token ? (
+                                <button
+                                    onClick={handleLogout}
+                                    className="ml-3 cursor-pointer inline-flex items-center justify-center rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
+                                >
+                                    Sign Out
+                                </button>
+                            ) : (
+                                <a
+                                    href="/contact"
+                                    className="ml-3 inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
+                                >
+                                    Get early access
+                                </a>
+                            )}
                         </nav>
 
                         {/* Mobile */}
                         <div className="flex items-center gap-2 md:hidden">
-                            <a
-                                href="/contact"
-                                className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors"
-                            >
-                                Get access
-                            </a>
+                            {!token && (
+                                <a
+                                    href="/contact"
+                                    className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors"
+                                >
+                                    Get access
+                                </a>
+                            )}
                             <button
                                 onClick={() => setMenuOpen((v) => !v)}
                                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 transition-colors"
@@ -128,6 +151,14 @@ export default function Header() {
                                         {label}
                                     </a>
                                 ))}
+                                {token && (
+                                    <button
+                                        onClick={handleLogout}
+                                        className="cursor-pointer mt-1 rounded-lg px-3 py-2.5 text-left text-sm text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+                                    >
+                                        Sign Out
+                                    </button>
+                                )}
                             </nav>
                         </div>
                     </div>
