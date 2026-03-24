@@ -43,6 +43,33 @@ html {
   scrollbar-width: none;
 }
 
+/* Styled violet scrollbar for review cards */
+.scrollbar-violet::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+.scrollbar-violet::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+  margin: 0 12px;
+}
+
+.scrollbar-violet::-webkit-scrollbar-thumb {
+  background: rgb(167 139 250 / 0.35);
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+
+.scrollbar-violet::-webkit-scrollbar-thumb:hover {
+  background: rgb(139 92 246 / 0.55);
+}
+
+.scrollbar-violet {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(167 139 250 / 0.35) transparent;
+}
+
 @keyframes glow-drift-a {
   0%,  100% { transform: translate(0,    0)    scale(1);    }
   25%        { transform: translate(24px, -18px) scale(1.04); }

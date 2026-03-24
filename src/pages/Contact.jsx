@@ -122,7 +122,7 @@ export default function Contact() {
                                         <button
                                             type="submit"
                                             disabled={status === "sending" || status === "sent"}
-                                            className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
+                                            className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
                                         >
                                             {status === "sent" ? "Message sent" : status === "sending" ? "Sending..." : "Send message"}
                                         </button>

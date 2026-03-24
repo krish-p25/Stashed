@@ -113,9 +113,9 @@ function ReviewsScroller() {
                 <div
                     ref={scrollerRef}
                     className="
-                        max-h-[420px] overflow-y-auto pr-1
-                        md:max-h-none md:overflow-y-hidden md:overflow-x-auto md:pr-0
-                        scroll-smooth md:scrollbar-hidden
+                        max-h-[420px] overflow-y-auto pr-1 scrollbar-violet
+                        md:max-h-none md:overflow-y-hidden md:overflow-x-auto md:pr-0 md:pb-2
+                        scroll-smooth
                     "
                 >
                     <div className="flex flex-col gap-4 md:flex-row md:gap-4 md:pb-2">
@@ -132,22 +132,22 @@ function ReviewsScroller() {
                     </div>
                 </div>
 
-                {showHint && (
-                    <>
-                        <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 md:block">
-                            <div className="flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3 py-2 shadow-sm">
-                                <span className="text-xs text-zinc-600">Scroll</span>
-                                <span className="animate-bounce-x text-violet-600">→</span>
-                            </div>
-                        </div>
-                        <div className="pointer-events-none absolute bottom-2 left-1/2 block -translate-x-1/2 md:hidden">
-                            <div className="flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3 py-2 shadow-sm">
-                                <span className="text-xs text-zinc-600">Scroll</span>
-                                <span className="animate-bounce text-violet-600">↓</span>
-                            </div>
-                        </div>
-                    </>
-                )}
+                <div
+                    className={`pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 md:block transition-opacity duration-300 ${showHint ? "opacity-100" : "opacity-0"}`}
+                >
+                    <div className="flex items-center gap-2 rounded-full border border-violet-200 bg-white/90 px-3 py-2 shadow-sm backdrop-blur-sm">
+                        <span className="text-xs text-zinc-600">Scroll</span>
+                        <span className="animate-bounce-x text-violet-600">→</span>
+                    </div>
+                </div>
+                <div
+                    className={`pointer-events-none absolute bottom-2 left-1/2 block -translate-x-1/2 md:hidden transition-opacity duration-300 ${showHint ? "opacity-100" : "opacity-0"}`}
+                >
+                    <div className="flex items-center gap-2 rounded-full border border-violet-200 bg-white/90 px-3 py-2 shadow-sm backdrop-blur-sm">
+                        <span className="text-xs text-zinc-600">Scroll</span>
+                        <span className="animate-bounce text-violet-600">↓</span>
+                    </div>
+                </div>
             </div>
         </div>
     );
