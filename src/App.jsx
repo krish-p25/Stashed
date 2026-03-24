@@ -6,6 +6,7 @@ import Features    from "./pages/Features.jsx";
 import HowItWorks  from "./pages/HowItWorks.jsx";
 import UseCases    from "./pages/UseCases.jsx";
 import Contact     from "./pages/Contact.jsx";
+import Privacy     from "./pages/Privacy.jsx";
 import Login       from "./pages/Login";
 import Dashboard   from "./pages/Dashboard";
 import EventDetail from "./pages/EventDetail";
@@ -21,6 +22,7 @@ export default function App() {
                     <Route path="/how-it-works" element={<HowItWorks />} />
                     <Route path="/use-cases"  element={<UseCases />} />
                     <Route path="/contact"    element={<Contact />} />
+                    <Route path="/privacy"    element={<Privacy />} />
                     <Route path="/login"      element={<Login />} />
 
                     <Route element={<ProtectedRoute />}>
