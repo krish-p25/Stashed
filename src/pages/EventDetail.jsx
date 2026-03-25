@@ -100,13 +100,13 @@ function CopyButton({ text }) {
 }
 
 const EyeOff = () => (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
     </svg>
 );
 
 const EyeOn = () => (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
     </svg>
@@ -115,13 +115,15 @@ const EyeOn = () => (
 function ViewPinButton({ pin }) {
     const [visible, setVisible] = useState(false);
 
+    if (!pin) return null;
+
     return (
         <button
             onClick={() => setVisible((v) => !v)}
-            className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+            className="cursor-pointer flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
         >
             {visible ? <EyeOff /> : <EyeOn />}
-            {visible ? pin : "View PIN"}
+            <span>{visible ? pin : "View PIN"}</span>
         </button>
     );
 }
@@ -176,8 +178,9 @@ function PinSection({ event, token, onUpdated }) {
     }
 
     return (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
+            {/* Header row — stacks on mobile */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2.5">
                     <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${event.pinRequired ? "bg-violet-100" : "bg-zinc-100"}`}>
                         <svg className={`h-4 w-4 ${event.pinRequired ? "text-violet-600" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,20 +196,20 @@ function PinSection({ event, token, onUpdated }) {
                 </div>
 
                 {!mode && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                         {event.pinRequired ? (
                             <>
                                 <ViewPinButton pin={event.pin} />
                                 <button
                                     onClick={() => setMode("change")}
-                                    className="cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+                                    className="cursor-pointer flex-1 sm:flex-none rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors text-center"
                                 >
                                     Change PIN
                                 </button>
                                 <button
                                     onClick={() => callApi({ action: "disable" })}
                                     disabled={saving}
-                                    className="cursor-pointer rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50"
+                                    className="cursor-pointer flex-1 sm:flex-none rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50 text-center"
                                 >
                                     Remove PIN
                                 </button>
@@ -214,7 +217,7 @@ function PinSection({ event, token, onUpdated }) {
                         ) : (
                             <button
                                 onClick={() => setMode("enable")}
-                                className="cursor-pointer rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors"
+                                className="cursor-pointer flex-1 sm:flex-none rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors text-center"
                             >
                                 Enable PIN
                             </button>
@@ -230,14 +233,23 @@ function PinSection({ event, token, onUpdated }) {
                     {mode === "change" && (
                         <div>
                             <label className="block text-xs font-medium text-zinc-600 mb-1.5">Current PIN</label>
-                            <input
-                                type={showPin ? "text" : "password"}
-                                value={currentPin}
-                                onChange={handlePinInput(setCurrentPin)}
-                                inputMode="numeric"
-                                placeholder="••••"
-                                className="w-32 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
-                            />
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type={showPin ? "text" : "password"}
+                                    value={currentPin}
+                                    onChange={handlePinInput(setCurrentPin)}
+                                    inputMode="numeric"
+                                    placeholder="••••"
+                                    className="flex-1 min-w-0 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPin((v) => !v)}
+                                    className="cursor-pointer shrink-0 text-zinc-400 hover:text-zinc-600 transition-colors"
+                                >
+                                    {showPin ? <EyeOff /> : <EyeOn />}
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -254,12 +266,12 @@ function PinSection({ event, token, onUpdated }) {
                                 inputMode="numeric"
                                 placeholder="••••"
                                 autoFocus
-                                className="w-32 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
+                                className="flex-1 min-w-0 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPin((v) => !v)}
-                                className="cursor-pointer text-zinc-400 hover:text-zinc-600 transition-colors"
+                                className="cursor-pointer shrink-0 text-zinc-400 hover:text-zinc-600 transition-colors"
                             >
                                 {showPin ? <EyeOff /> : <EyeOn />}
                             </button>
@@ -301,7 +313,7 @@ function DeleteModal({ eventTitle, onConfirm, onCancel, deleting }) {
     return (
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-            <div className={`relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl transition-all duration-200 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
+            <div className={`relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-xl transition-all duration-200 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
                 <div className="flex items-start gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-100">
                         <svg className="h-4 w-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -426,7 +438,7 @@ export default function EventDetail() {
                 <Container>
                     <Link
                         to="/dashboard"
-                        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors mb-8"
+                        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors mb-6 sm:mb-8"
                     >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
@@ -456,14 +468,14 @@ export default function EventDetail() {
                     )}
 
                     {event && (
-                        <div className="space-y-8">
+                        <div className="space-y-6 sm:space-y-8">
                             {/* Drive connected toast */}
                             {driveToast && (
                                 <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                                     <span>Google Drive connected — uploads will sync to your Drive folder.</span>
                                     <button
                                         onClick={() => setDriveToast(false)}
-                                        className="ml-4 cursor-pointer text-emerald-500 hover:text-emerald-700 transition-colors"
+                                        className="ml-4 cursor-pointer shrink-0 text-emerald-500 hover:text-emerald-700 transition-colors"
                                         aria-label="Dismiss"
                                     >
                                         ✕
@@ -472,34 +484,35 @@ export default function EventDetail() {
                             )}
 
                             {/* Event header */}
-                            <div className="rounded-2xl border border-violet-200/70 bg-white p-6 shadow-sm shadow-violet-100/30">
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                    <div className="space-y-2">
-                                        <h1 className="text-2xl font-semibold text-zinc-900">{event.title}</h1>
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[event.status] ?? STATUS_STYLES.closed}`}>
-                                                {fmtStatus(event.status)}
-                                            </span>
-                                            <div className="flex items-center gap-2 rounded-lg border border-violet-100 bg-violet-50 px-2.5 py-1">
-                                                <span className="font-mono text-xs text-violet-600">/{event.slug}</span>
-                                                <CopyButton text={event.slug} />
-                                            </div>
-                                        </div>
+                            <div className="rounded-2xl border border-violet-200/70 bg-white p-4 sm:p-6 shadow-sm shadow-violet-100/30">
+                                {/* Title + delete — separate rows on mobile */}
+                                <div className="flex items-start justify-between gap-3">
+                                    <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 leading-snug">
+                                        {event.title}
+                                    </h1>
+                                    <button
+                                        onClick={() => setShowDelete(true)}
+                                        className="cursor-pointer shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors"
+                                    >
+                                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </div>
+
+                                {/* Pills + date */}
+                                <div className="mt-3 flex flex-wrap items-center gap-2">
+                                    <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[event.status] ?? STATUS_STYLES.closed}`}>
+                                        {fmtStatus(event.status)}
+                                    </span>
+                                    <div className="flex items-center gap-2 rounded-lg border border-violet-100 bg-violet-50 px-2.5 py-1">
+                                        <span className="font-mono text-xs text-violet-600">/{event.slug}</span>
+                                        <CopyButton text={event.slug} />
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xs text-zinc-400">
-                                            Created {new Date(event.createdAt).toLocaleDateString()}
-                                        </span>
-                                        <button
-                                            onClick={() => setShowDelete(true)}
-                                            className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors"
-                                        >
-                                            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Delete
-                                        </button>
-                                    </div>
+                                    <span className="text-xs text-zinc-400 ml-auto">
+                                        Created {new Date(event.createdAt).toLocaleDateString()}
+                                    </span>
                                 </div>
                             </div>
 
@@ -527,7 +540,7 @@ export default function EventDetail() {
                                         </p>
                                     </div>
                                 ) : (
-                                    <div className="grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-5">
+                                    <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
                                         {event.uploads.map((upload) => (
                                             <UploadCard key={upload.id} upload={upload} />
                                         ))}
