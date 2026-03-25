@@ -4,20 +4,16 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
     const [scrolled,  setScrolled]  = useState(false);
-    const [menuOpen,  setMenuOpen]  = useState(false);
+    const [menuOpenPath, setMenuOpenPath] = useState(null);
     const { pathname } = useLocation();
     const navigate     = useNavigate();
-    const { token, user, logout } = useAuth();
+    const { token, logout } = useAuth();
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener("scroll", onScroll, { passive: true });
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
-
-    useEffect(() => {
-        setMenuOpen(false);
-    }, [pathname]);
 
     function handleLogout() {
         logout();
@@ -37,26 +33,27 @@ export default function Header() {
     ];
 
     const navLinks = token ? authedLinks : guestLinks;
+    const menuOpen = menuOpenPath === pathname;
 
     return (
         <div className="fixed inset-x-0 top-0 z-50 pointer-events-none">
             <div
-                className={`pointer-events-auto mx-auto transition-all duration-300 ease-linear ${
+                className={`pointer-events-auto mx-auto transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                     scrolled
                         ? "mt-3 max-w-5xl px-4 sm:px-6"
                         : "mt-0 max-w-[100vw] px-0"
                 }`}
             >
                 <div
-                    className={`transition-all duration-300 ease-linear ${
+                    className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                         scrolled
-                            ? "bg-white/60 backdrop-blur-xl rounded-2xl border border-violet-200/60 shadow-[0_8px_40px_rgba(139,92,246,0.18)]"
+                            ? "bg-white/40 backdrop-blur-xl rounded-2xl border border-violet-200/60 shadow-[0_8px_40px_rgba(139,92,246,0.18)]"
                             : "bg-white/90 backdrop-blur-md border-b border-transparent shadow-none rounded-none"
                     }`}
                 >
                     {/* Main bar */}
                     <div
-                        className={`flex items-center justify-between w-full px-5 sm:px-6 transition-[height] duration-300 ease-linear ${
+                        className={`flex items-center justify-between w-full px-5 sm:px-6 transition-[height] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                             scrolled ? "h-14" : "h-16"
                         }`}
                     >
@@ -113,7 +110,11 @@ export default function Header() {
                                 </a>
                             )}
                             <button
-                                onClick={() => setMenuOpen((v) => !v)}
+                                onClick={() => {
+                                    setMenuOpenPath((currentPath) => (
+                                        currentPath === pathname ? null : pathname
+                                    ));
+                                }}
                                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 transition-colors"
                                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                             >
@@ -132,7 +133,7 @@ export default function Header() {
 
                     {/* Mobile dropdown */}
                     <div
-                        className={`overflow-hidden transition-all duration-200 ease-linear md:hidden ${
+                        className={`overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] md:hidden ${
                             menuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
                         }`}
                     >
