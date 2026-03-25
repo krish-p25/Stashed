@@ -197,7 +197,7 @@ function QRModal({ event, uploadUrl, onClose }) {
 }
 
 function ShareSection({ event }) {
-    const uploadUrl = `${window.location.origin}/upload/${event.slug}`;
+    const uploadUrl = `${window.location.origin}/upload/${event.userId}/${event.slug}`;
     const [copied,  setCopied]  = useState(false);
     const [showQR,  setShowQR]  = useState(false);
 
