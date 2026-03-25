@@ -76,7 +76,7 @@ export default function Login() {
                                     <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">Log in</h1>
                                 </div>
                                 <div className="hidden sm:block rounded-2xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-600 whitespace-nowrap">
-                                    Members only
+                                    Members Only
                                 </div>
                             </div>
                             <p className="mt-2 text-sm text-zinc-600 leading-6">
