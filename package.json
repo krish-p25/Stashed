@@ -11,6 +11,7 @@
         "deploy": "vite build && scp -r dist/. Administrator@13.42.39.116:\"C:/inetpub/stashed/\""
     },
     "dependencies": {
+        "qrcode.react": "^4.2.0",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
         "react-router-dom": "^7.11.0"
