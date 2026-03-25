@@ -11,6 +11,7 @@ import Login       from "./pages/Login";
 import Dashboard   from "./pages/Dashboard";
 import EventDetail from "./pages/EventDetail";
 import CreateEvent from "./pages/CreateEvent";
+import Upload     from "./pages/Upload";
 
 export default function App() {
     return (
@@ -24,6 +25,7 @@ export default function App() {
                     <Route path="/contact"    element={<Contact />} />
                     <Route path="/privacy"    element={<Privacy />} />
                     <Route path="/login"      element={<Login />} />
+                    <Route path="/upload/:userId/:slug" element={<Upload />} />
 
                     <Route element={<ProtectedRoute />}>
                         <Route path="/dashboard"                  element={<Dashboard />} />
