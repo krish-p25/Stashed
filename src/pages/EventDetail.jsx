@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
 import { useAuth } from "../context/AuthContext";
@@ -111,6 +112,163 @@ const EyeOn = () => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
     </svg>
 );
+
+function QRModal({ event, uploadUrl, onClose }) {
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const id = requestAnimationFrame(() => setVisible(true));
+        return () => cancelAnimationFrame(id);
+    }, []);
+
+    function handleClose() {
+        setVisible(false);
+        setTimeout(onClose, 200);
+    }
+
+    return (
+        <div
+            className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}
+            onClick={handleClose}
+        >
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+
+            <div
+                className={`relative w-full max-w-sm transition-all duration-200 ${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-3 scale-95"}`}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Shareable card */}
+                <div className="rounded-3xl bg-white shadow-2xl overflow-hidden">
+
+                    {/* Top gradient band */}
+                    <div className="bg-gradient-to-br from-violet-600 to-violet-500 px-7 pt-7 pb-8">
+                        {/* Branding */}
+                        <div className="flex items-center gap-2 mb-6">
+                            <img src="/logo_black.png" alt="Stashed" className="h-6 w-6 brightness-0 invert" />
+                            <span className="text-sm font-semibold text-white/90 tracking-wide">Stashed</span>
+                        </div>
+
+                        {/* Headline */}
+                        <h2 className="text-2xl font-bold text-white leading-snug">
+                            {event.title}
+                        </h2>
+                        <p className="mt-1.5 text-sm text-violet-200">
+                            Scan to upload your photos &amp; videos
+                        </p>
+                    </div>
+
+                    {/* QR code area */}
+                    <div className="flex flex-col items-center px-7 py-7 bg-white">
+                        <div className="rounded-2xl border border-zinc-100 bg-zinc-50 p-4 shadow-inner">
+                            <QRCodeSVG
+                                value={uploadUrl}
+                                size={192}
+                                fgColor="#18181b"
+                                bgColor="transparent"
+                                level="M"
+                            />
+                        </div>
+
+                        {/* URL */}
+                        <p className="mt-4 text-xs text-zinc-400 font-mono text-center break-all">
+                            {uploadUrl}
+                        </p>
+
+                        {/* Tagline */}
+                        <p className="mt-4 text-xs text-zinc-400 text-center leading-relaxed">
+                            Point your camera at the QR code to instantly upload to this event — no app required.
+                        </p>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="px-7 pb-6 flex items-center justify-between">
+                        <span className="text-xs text-zinc-300">stashed.krishrp.xyz</span>
+                        <button
+                            onClick={handleClose}
+                            className="cursor-pointer rounded-xl border border-zinc-200 px-4 py-2 text-xs font-medium text-zinc-500 hover:bg-zinc-50 transition-colors duration-200"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ShareSection({ event }) {
+    const uploadUrl = `${window.location.origin}/upload/${event.slug}`;
+    const [copied,  setCopied]  = useState(false);
+    const [showQR,  setShowQR]  = useState(false);
+
+    async function handleCopy() {
+        await navigator.clipboard.writeText(uploadUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }
+
+    return (
+        <>
+            {showQR && (
+                <QRModal
+                    event={event}
+                    uploadUrl={uploadUrl}
+                    onClose={() => setShowQR(false)}
+                />
+            )}
+
+            <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
+                <div className="flex items-center gap-2.5 mb-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100">
+                        <svg className="h-4 w-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-zinc-800">Share with guests</p>
+                        <p className="text-xs text-zinc-400">Send this link or QR code so guests can upload.</p>
+                    </div>
+                </div>
+
+                {/* URL row */}
+                <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0 flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5">
+                        <svg className="h-3.5 w-3.5 shrink-0 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        <span className="text-xs font-mono text-zinc-600 truncate">{uploadUrl}</span>
+                    </div>
+                    <button
+                        onClick={handleCopy}
+                        title={copied ? "Copied!" : "Copy link"}
+                        className="cursor-pointer shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors duration-200"
+                    >
+                        {copied ? (
+                            <svg className="h-3.5 w-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                        ) : (
+                            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        )}
+                        <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
+                    </button>
+                    <button
+                        onClick={() => setShowQR(true)}
+                        className="cursor-pointer shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors duration-200"
+                    >
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        <span className="hidden sm:inline">View QR Code</span>
+                        <span className="sm:hidden">QR</span>
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+}
 
 function ViewPinButton({ pin }) {
     const [visible, setVisible] = useState(false);
@@ -515,6 +673,9 @@ export default function EventDetail() {
                                     </span>
                                 </div>
                             </div>
+
+                            {/* Share */}
+                            <ShareSection event={event} />
 
                             {/* PIN protection */}
                             <PinSection
