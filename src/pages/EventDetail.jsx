@@ -566,6 +566,7 @@ export default function EventDetail() {
 
     useEffect(() => {
         loadEvent();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     async function handleDelete() {
@@ -596,12 +597,12 @@ export default function EventDetail() {
                 <Container>
                     <Link
                         to="/dashboard"
-                        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors mb-6 sm:mb-8"
+                        className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-800 transition-colors duration-200 mb-4"
                     >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 19l-7-7 7-7" />
                         </svg>
-                        Back to dashboard
+                        Dashboard
                     </Link>
 
                     {loading && (
@@ -642,35 +643,51 @@ export default function EventDetail() {
                             )}
 
                             {/* Event header */}
-                            <div className="rounded-2xl border border-violet-200/70 bg-white p-4 sm:p-6 shadow-sm shadow-violet-100/30">
-                                {/* Title + delete — separate rows on mobile */}
-                                <div className="flex items-start justify-between gap-3">
-                                    <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 leading-snug">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b border-zinc-100">
+                                {/* Left: title + meta */}
+                                <div className="space-y-2.5">
+                                    <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 leading-tight">
                                         {event.title}
                                     </h1>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[event.status] ?? STATUS_STYLES.closed}`}>
+                                            {fmtStatus(event.status)}
+                                        </span>
+<span className="text-xs text-zinc-500">
+                                            Created {new Date(event.createdAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Right: actions */}
+                                <div className="flex items-center gap-2 sm:shrink-0">
+                                    {event.driveFolderId && (
+                                        <a
+                                            href={`https://drive.google.com/drive/folders/${event.driveFolderId}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors duration-200"
+                                        >
+                                            <svg className="h-3.5 w-3.5" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L27.5 53H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z" fill="#0066DA"/>
+                                                <path d="M43.65 25L29.9 1.2C28.55.4 27 0 25.45 0 23.9 0 22.35.4 21 1.2l-7.15 4.1L27.5 29H59.8L43.65 25z" fill="#00AC47"/>
+                                                <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8L73.55 76.8z" fill="#EA4335"/>
+                                                <path d="M43.65 25L57.4 1.2C56.05.4 54.5 0 52.95 0H34.35c-1.55 0-3.1.4-4.45 1.2L43.65 25z" fill="#00832D"/>
+                                                <path d="M59.8 53H27.5L13.75 76.8c1.35.8 2.9 1.2 4.45 1.2h50.9c1.55 0 3.1-.4 4.45-1.2L59.8 53z" fill="#2684FC"/>
+                                                <path d="M73.4 26.5l-7.15-4.1C64.9 21.6 63.35 21.2 61.8 21.2c-1.55 0-3.1.4-4.45 1.2L43.65 25 59.8 53h27.3L73.4 26.5z" fill="#FFBA00"/>
+                                            </svg>
+                                            Go To Drive
+                                        </a>
+                                    )}
                                     <button
                                         onClick={() => setShowDelete(true)}
-                                        className="cursor-pointer shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors"
+                                        className="cursor-pointer flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors duration-200"
                                     >
                                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                         Delete
                                     </button>
-                                </div>
-
-                                {/* Pills + date */}
-                                <div className="mt-3 flex flex-wrap items-center gap-2">
-                                    <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[event.status] ?? STATUS_STYLES.closed}`}>
-                                        {fmtStatus(event.status)}
-                                    </span>
-                                    <div className="flex items-center gap-2 rounded-lg border border-violet-100 bg-violet-50 px-2.5 py-1">
-                                        <span className="font-mono text-xs text-violet-600">/{event.slug}</span>
-                                        <CopyButton text={event.slug} />
-                                    </div>
-                                    <span className="text-xs text-zinc-400 ml-auto">
-                                        Created {new Date(event.createdAt).toLocaleDateString()}
-                                    </span>
                                 </div>
                             </div>
 
