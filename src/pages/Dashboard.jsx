@@ -51,7 +51,7 @@ function CopyUrlButton({ url }) {
 }
 
 function EventCard({ event, onClick }) {
-    const uploadUrl = `${window.location.origin}/upload/${event.slug}`;
+    const uploadUrl = `${window.location.origin}/upload/${event.userId}/${event.slug}`;
 
     return (
         <div
