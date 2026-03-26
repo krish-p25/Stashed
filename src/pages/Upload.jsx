@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import confetti from "canvas-confetti";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -156,20 +157,45 @@ function FileTile({ file, status }) {
     );
 }
 
+// ─── Progress bar ─────────────────────────────────────────────────────────────
+
+function ProgressBar({ done, total }) {
+    const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+    return (
+        <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-zinc-500">
+                <span>Uploading your photos…</span>
+                <span className="font-medium text-zinc-700">{done} / {total}</span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-zinc-100 overflow-hidden">
+                <div
+                    className="h-full rounded-full bg-violet-500 transition-all duration-500"
+                    style={{ width: `${pct}%` }}
+                />
+            </div>
+        </div>
+    );
+}
+
 // ─── Upload form ─────────────────────────────────────────────────────────────
 
 function UploadForm({ event, pin, onDone }) {
-    const fileInputRef          = useRef(null);
+    const fileInputRef               = useRef(null);
     const [files,        setFiles]        = useState([]);
     const [statuses,     setStatuses]     = useState([]);
     const [uploaderName, setUploaderName] = useState("");
     const [dragging,     setDragging]     = useState(false);
     const [uploading,    setUploading]    = useState(false);
+    const [collapsed,    setCollapsed]    = useState(false);
+    const [userExpanded, setUserExpanded] = useState(false);
+
+    const doneCount = statuses.filter(s => s === "done").length;
 
     function addFiles(incoming) {
         const valid = Array.from(incoming).filter(
             (f) => f.type.startsWith("image/") || f.type.startsWith("video/")
         );
+        if (!uploading) { setCollapsed(false); setUserExpanded(false); }
         setFiles((prev) => [...prev, ...valid]);
         setStatuses((prev) => [...prev, ...valid.map(() => "pending")]);
     }
@@ -188,6 +214,8 @@ function UploadForm({ event, pin, onDone }) {
     async function handleUpload() {
         if (files.length === 0 || uploading) return;
         setUploading(true);
+        setCollapsed(true);
+        setUserExpanded(false);
 
         let doneCount = 0;
         for (let i = 0; i < files.length; i++) {
@@ -265,23 +293,59 @@ function UploadForm({ event, pin, onDone }) {
 
             {/* File grid */}
             {files.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {files.map((file, i) => (
-                        <div key={i} className="relative">
-                            <FileTile file={file} status={statuses[i]} />
-                            {statuses[i] === "pending" && !uploading && (
-                                <button
-                                    onClick={() => removeFile(i)}
-                                    className="cursor-pointer absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-800 text-white shadow"
-                                >
-                                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            )}
+                <>
+                    {uploading && <ProgressBar done={doneCount} total={files.length} />}
+
+                    <div className={`relative overflow-hidden transition-all duration-700 ease-in-out ${
+                        collapsed && !userExpanded ? "max-h-52" : "max-h-[9999px]"
+                    }`}>
+                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                            {files.map((file, i) => (
+                                <div key={i} className="relative">
+                                    <FileTile file={file} status={statuses[i]} />
+                                    {statuses[i] === "pending" && !uploading && (
+                                        <button
+                                            onClick={() => removeFile(i)}
+                                            className="cursor-pointer absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-800/80 text-white shadow"
+                                        >
+                                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
+
+                        {collapsed && !userExpanded && (
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+                        )}
+                    </div>
+
+                    {collapsed && (
+                        <button
+                            type="button"
+                            onClick={() => setUserExpanded(v => !v)}
+                            className="flex w-full cursor-pointer items-center justify-center gap-1.5 py-1 text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+                        >
+                            {userExpanded ? (
+                                <>
+                                    Collapse
+                                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                    </svg>
+                                </>
+                            ) : (
+                                <>
+                                    Show all {files.length} photos
+                                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </>
+                            )}
+                        </button>
+                    )}
+                </>
             )}
 
             {/* Name field */}
@@ -313,6 +377,10 @@ function UploadForm({ event, pin, onDone }) {
 // ─── Success screen ───────────────────────────────────────────────────────────
 
 function SuccessScreen({ count, eventTitle, onUploadMore }) {
+    useEffect(() => {
+        confetti({ particleCount: 180, spread: 90, origin: { y: 0.6 } });
+    }, []);
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 mb-5">
@@ -340,11 +408,12 @@ function SuccessScreen({ count, eventTitle, onUploadMore }) {
 
 export default function Upload() {
     const { userId, slug } = useParams();
-    const [phase,  setPhase] = useState("loading"); // loading | error | pin | upload | done
-    const [event,  setEvent] = useState(null);
-    const [error,  setError] = useState(null);
-    const [pin,    setPin]   = useState(null);
+    const [phase,    setPhase]    = useState("loading"); // loading | error | pin | upload | done
+    const [event,    setEvent]    = useState(null);
+    const [error,    setError]    = useState(null);
+    const [pin,      setPin]      = useState(null);
     const [doneCount, setDoneCount] = useState(0);
+    const [visible,  setVisible]  = useState(false);
 
     // Expose userId/slug to PinGate (avoids passing through props chain)
     useEffect(() => {
@@ -352,26 +421,46 @@ export default function Upload() {
         window._slug = slug;
     }, [userId, slug]);
 
+    // Fade in on initial load
+    useEffect(() => {
+        const id = requestAnimationFrame(() => setVisible(true));
+        return () => cancelAnimationFrame(id);
+    }, []);
+
+    // Cross-fade helper: scroll to top (if needed) → fade out → swap phase → fade in
+    const transitionTo = useCallback((newPhase, count) => {
+        const needsScroll = window.scrollY > 0;
+        if (needsScroll) window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => {
+            setVisible(false);
+            setTimeout(() => {
+                if (count !== undefined) setDoneCount(count);
+                setPhase(newPhase);
+                requestAnimationFrame(() => setVisible(true));
+            }, 500);
+        }, needsScroll ? 400 : 0);
+    }, []);
+
     useEffect(() => {
         async function load() {
             try {
                 const res  = await fetch(`${API}/api/public/events/${userId}/${slug}`);
                 const json = await res.json();
-                if (!json.ok) { setError(json.error || "Event not found."); setPhase("error"); return; }
+                if (!json.ok) { setError(json.error || "Event not found."); transitionTo("error"); return; }
 
                 const ev = json.event;
                 setEvent(ev);
 
                 if (ev.status !== "active") {
                     setError("This event is not currently accepting uploads.");
-                    setPhase("error");
+                    transitionTo("error");
                     return;
                 }
 
-                setPhase(ev.pinRequired ? "pin" : "upload");
+                transitionTo(ev.pinRequired ? "pin" : "upload");
             } catch {
                 setError("Could not load event. Check your connection and try again.");
-                setPhase("error");
+                transitionTo("error");
             }
         }
         load();
@@ -381,46 +470,48 @@ export default function Upload() {
         <div className="min-h-screen bg-white">
             <TopBar />
 
-            {phase === "loading" && (
-                <div className="flex items-center justify-center min-h-[70vh]">
-                    <div className="h-6 w-6 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
-                </div>
-            )}
-
-            {phase === "error" && (
-                <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 mb-4">
-                        <svg className="h-7 w-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                        </svg>
+            <div className={`transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
+                {phase === "loading" && (
+                    <div className="flex items-center justify-center min-h-[70vh]">
+                        <div className="h-6 w-6 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
                     </div>
-                    <h2 className="text-lg font-bold text-zinc-900 mb-1">Unavailable</h2>
-                    <p className="text-sm text-zinc-500 max-w-xs">{error}</p>
-                </div>
-            )}
+                )}
 
-            {phase === "pin" && event && (
-                <PinGate
-                    eventTitle={event.title}
-                    onVerified={(verifiedPin) => { setPin(verifiedPin); setPhase("upload"); }}
-                />
-            )}
+                {phase === "error" && (
+                    <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 text-center">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 mb-4">
+                            <svg className="h-7 w-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-lg font-bold text-zinc-900 mb-1">Unavailable</h2>
+                        <p className="text-sm text-zinc-500 max-w-xs">{error}</p>
+                    </div>
+                )}
 
-            {phase === "upload" && event && (
-                <UploadForm
-                    event={event}
-                    pin={pin}
-                    onDone={(count) => { setDoneCount(count); setPhase("done"); }}
-                />
-            )}
+                {phase === "pin" && event && (
+                    <PinGate
+                        eventTitle={event.title}
+                        onVerified={(verifiedPin) => { setPin(verifiedPin); transitionTo("upload"); }}
+                    />
+                )}
 
-            {phase === "done" && event && (
-                <SuccessScreen
-                    count={doneCount}
-                    eventTitle={event.title}
-                    onUploadMore={() => setPhase("upload")}
-                />
-            )}
+                {phase === "upload" && event && (
+                    <UploadForm
+                        event={event}
+                        pin={pin}
+                        onDone={(count) => transitionTo("done", count)}
+                    />
+                )}
+
+                {phase === "done" && event && (
+                    <SuccessScreen
+                        count={doneCount}
+                        eventTitle={event.title}
+                        onUploadMore={() => transitionTo("upload")}
+                    />
+                )}
+            </div>
         </div>
     );
 }
