@@ -186,7 +186,7 @@ function QRModal({ event, uploadUrl, onClose }) {
     );
 }
 
-function ShareSection({ event }) {
+function ShareSection({ event, token, onUpdated }) {
     const uploadUrl = `${window.location.origin}/upload/${event.userId}/${event.slug}`;
     const [copied,  setCopied]  = useState(false);
     const [showQR,  setShowQR]  = useState(false);
@@ -255,20 +255,385 @@ function ShareSection({ event }) {
                         <span className="sm:hidden">QR</span>
                     </button>
                 </div>
+
+                <InlinePinSection event={event} token={token} onUpdated={onUpdated} />
             </div>
         </>
     );
 }
 
-function ViewPinButton({ pin }) {
+function GallerySection({ event, token, onUpdated }) {
+    const galleryUrl   = `${window.location.origin}/gallery/${event.userId}/${event.slug}`;
+    const [copied,      setCopied]      = useState(false);
+    const [saving,      setSaving]      = useState(false);
+    const [showAll,     setShowAll]     = useState(false);
+    const [reviewQueue, setReviewQueue] = useState(null);
+    const [reviewPos,   setReviewPos]   = useState(0);
+    const [reviewBusy,  setReviewBusy]  = useState(false);
+
+    async function handleCopy() {
+        await navigator.clipboard.writeText(galleryUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }
+
+    async function toggleAutoApprove() {
+        setSaving(true);
+        try {
+            const res = await fetch(`${API}/api/events/${event.id}/settings`, {
+                method:  "PATCH",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body:    JSON.stringify({ autoApprove: !event.autoApprove }),
+            });
+            const json = await res.json();
+            if (json.ok) onUpdated();
+        } finally {
+            setSaving(false);
+        }
+    }
+
+    async function patchUploads(ids, status) {
+        await fetch(`${API}/api/events/${event.id}/uploads`, {
+            method:  "PATCH",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body:    JSON.stringify({ ids, status }),
+        });
+    }
+
+    async function batchUpdate(ids, status) {
+        await patchUploads(ids, status);
+        onUpdated();
+    }
+
+    function startReview(groupUploads, startIdx) {
+        const queue = [...groupUploads.slice(startIdx), ...groupUploads.slice(0, startIdx)];
+        setReviewQueue(queue);
+        setReviewPos(0);
+    }
+
+    async function handleReviewAction(status) {
+        if (!reviewQueue || reviewBusy) return;
+        setReviewBusy(true);
+        try {
+            await patchUploads([reviewQueue[reviewPos].id], status);
+            const next = reviewPos + 1;
+            if (next >= reviewQueue.length) {
+                setReviewQueue(null);
+                setReviewPos(0);
+                onUpdated();
+            } else {
+                setReviewPos(next);
+            }
+        } finally {
+            setReviewBusy(false);
+        }
+    }
+
+    function closeReview() {
+        setReviewQueue(null);
+        setReviewPos(0);
+        onUpdated();
+    }
+
+    // Group uploads by uploader name
+    const uploads  = event.uploads ?? [];
+    const filtered = showAll ? uploads : uploads.filter(u => u.status === "pending");
+    const groups   = filtered.reduce((acc, u) => {
+        const key = u.uploaderName || "Anonymous";
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(u);
+        return acc;
+    }, {});
+
+    const pendingCount  = uploads.filter(u => u.status === "pending").length;
+    const isAutoApprove = event.autoApprove !== false;
+
+    return (
+        <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm space-y-5">
+            {reviewQueue && (
+                <ReviewModal
+                    upload={reviewQueue[reviewPos]}
+                    pos={reviewPos}
+                    total={reviewQueue.length}
+                    onAction={handleReviewAction}
+                    onClose={closeReview}
+                    busy={reviewBusy}
+                />
+            )}
+
+            {/* Header */}
+            <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100">
+                    <svg className="h-4 w-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <p className="text-sm font-medium text-zinc-800">Guest gallery</p>
+                    <p className="text-xs text-zinc-400">Share this link so guests can view approved photos.</p>
+                </div>
+            </div>
+
+            {/* Gallery URL row */}
+            <div className="flex items-center gap-2">
+                <div className="flex-1 min-w-0 flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5">
+                    <svg className="h-3.5 w-3.5 shrink-0 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    <span className="text-xs font-mono text-zinc-600 truncate">{galleryUrl}</span>
+                </div>
+                <button
+                    onClick={handleCopy}
+                    title={copied ? "Copied!" : "Copy gallery link"}
+                    className="cursor-pointer shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors duration-200"
+                >
+                    {copied ? (
+                        <svg className="h-3.5 w-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                    ) : (
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    )}
+                    <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
+                </button>
+                <a
+                    href={galleryUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="cursor-pointer shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors duration-200"
+                >
+                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    <span className="hidden sm:inline">Preview</span>
+                </a>
+            </div>
+
+            {/* Auto-approve toggle */}
+            <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
+                <div>
+                    <p className="text-sm font-medium text-zinc-700">Auto-approve uploads</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">New uploads appear in the gallery immediately</p>
+                </div>
+                <button
+                    onClick={toggleAutoApprove}
+                    disabled={saving}
+                    className={`cursor-pointer relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none disabled:opacity-50 ${isAutoApprove ? "bg-violet-600" : "bg-zinc-300"}`}
+                >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${isAutoApprove ? "translate-x-6" : "translate-x-1"}`} />
+                </button>
+            </div>
+
+            {/* Moderation panel — only when auto-approve is off */}
+            {!isAutoApprove && (
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-zinc-700">
+                            Moderation
+                            {pendingCount > 0 && (
+                                <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                                    {pendingCount} pending
+                                </span>
+                            )}
+                        </p>
+                        <button
+                            onClick={() => setShowAll(v => !v)}
+                            className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+                        >
+                            {showAll ? "Show pending only" : "Show all"}
+                        </button>
+                    </div>
+
+                    {Object.keys(groups).length === 0 ? (
+                        <p className="text-xs text-zinc-400 py-2">
+                            {showAll ? "No uploads yet." : "No pending uploads."}
+                        </p>
+                    ) : (
+                        Object.entries(groups).map(([name, groupUploads]) => (
+                            <GuestGroup
+                                key={name}
+                                name={name}
+                                uploads={groupUploads}
+                                onBatch={batchUpdate}
+                                onStartReview={startReview}
+                            />
+                        ))
+                    )}
+                </div>
+            )}
+
+            <InlinePinSection event={event} token={token} onUpdated={onUpdated} />
+        </div>
+    );
+}
+
+const STATUS_DOT = {
+    approved: { bg: "bg-emerald-500", icon: "M5 13l4 4L19 7" },
+    hidden:   { bg: "bg-rose-500",    icon: "M6 18L18 6M6 6l12 12" },
+    pending:  null,
+};
+
+function ReviewModal({ upload, pos, total, onAction, onClose, busy }) {
     const [visible, setVisible] = useState(false);
 
-    if (!pin) return null;
+    useEffect(() => {
+        const id = requestAnimationFrame(() => setVisible(true));
+        return () => cancelAnimationFrame(id);
+    }, []);
 
+    useEffect(() => {
+        function onKey(e) { if (e.key === "Escape") onClose(); }
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, [onClose]);
+
+    return (
+        <div
+            className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}
+            onClick={onClose}
+        >
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
+            <div
+                className={`relative w-full max-w-sm transition-all duration-200 ${visible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-2"}`}
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="rounded-2xl bg-white shadow-2xl overflow-hidden">
+                    {/* Header: counter + close */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+                        <span className="text-xs font-medium text-zinc-500">{pos + 1} of {total}</span>
+                        <button onClick={onClose} className="cursor-pointer text-zinc-400 hover:text-zinc-600 transition-colors">
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Image */}
+                    <div key={pos} className="bg-zinc-50 flex items-center justify-center" style={{ maxHeight: "55vh", overflow: "hidden" }}>
+                        {upload.mimeType?.startsWith("image/") ? (
+                            <img
+                                src={upload.fileUrl}
+                                alt={upload.fileName}
+                                className="w-full object-contain"
+                                style={{ maxHeight: "55vh" }}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center gap-2 p-10 text-center">
+                                <svg className="h-10 w-10 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                                <span className="text-sm text-zinc-400 break-all">{upload.fileName}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Info + actions */}
+                    <div className="px-4 pt-3 pb-4 space-y-3">
+                        <div>
+                            <p className="text-sm font-medium text-zinc-800 truncate">{upload.fileName}</p>
+                            {upload.uploaderName && (
+                                <p className="text-xs text-zinc-400 mt-0.5">{upload.uploaderName}</p>
+                            )}
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => onAction("hidden")}
+                                disabled={busy}
+                                className="cursor-pointer flex-1 rounded-xl border border-rose-200 bg-rose-50 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50"
+                            >
+                                Deny
+                            </button>
+                            <button
+                                onClick={() => onAction("approved")}
+                                disabled={busy}
+                                className="cursor-pointer flex-1 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                            >
+                                {busy ? "…" : "Approve"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function GuestGroup({ name, uploads, onBatch, onStartReview }) {
+    const [acting, setActing] = useState(null);
+
+    async function handleBatch(status) {
+        setActing(status === "approved" ? "approve" : "hide");
+        await onBatch(uploads.map(u => u.id), status);
+        setActing(null);
+    }
+
+    return (
+        <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-100 bg-zinc-50">
+                <p className="text-xs font-medium text-zinc-700">
+                    {name}
+                    <span className="ml-1.5 text-zinc-400 font-normal">({uploads.length})</span>
+                </p>
+                <div className="flex items-center gap-1.5">
+                    <button
+                        onClick={() => handleBatch("approved")}
+                        disabled={acting !== null}
+                        className="cursor-pointer rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                    >
+                        {acting === "approve" ? "…" : "Approve all"}
+                    </button>
+                    <button
+                        onClick={() => handleBatch("hidden")}
+                        disabled={acting !== null}
+                        className="cursor-pointer rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50"
+                    >
+                        {acting === "hide" ? "…" : "Hide all"}
+                    </button>
+                </div>
+            </div>
+            <div className="p-3 flex flex-wrap gap-2">
+                {uploads.map((upload, i) => {
+                    const dot = STATUS_DOT[upload.status];
+                    return (
+                        <button
+                            key={upload.id}
+                            onClick={() => onStartReview(uploads, i)}
+                            title={`${upload.fileName} — click to review`}
+                            className="cursor-pointer relative h-16 w-16 rounded-lg overflow-hidden bg-zinc-100 hover:opacity-80 transition-opacity"
+                        >
+                            {upload.mimeType?.startsWith("image/") ? (
+                                <img src={upload.fileUrl} alt={upload.fileName} className="h-full w-full object-cover" />
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center">
+                                    <svg className="h-6 w-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                </div>
+                            )}
+                            {dot && (
+                                <div className={`absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full ${dot.bg} flex items-center justify-center`}>
+                                    <svg className="h-2 w-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={dot.icon} />
+                                    </svg>
+                                </div>
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+function ViewPinButton({ pin }) {
+    const [visible, setVisible] = useState(false);
+    if (!pin) return null;
     return (
         <button
             onClick={() => setVisible((v) => !v)}
-            className="cursor-pointer flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+            className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-2.5 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
         >
             {visible ? <EyeOff /> : <EyeOn />}
             <span>{visible ? pin : "View PIN"}</span>
@@ -276,8 +641,8 @@ function ViewPinButton({ pin }) {
     );
 }
 
-function PinSection({ event, token, onUpdated }) {
-    const [mode,       setMode]       = useState(null); // null | "enable" | "change"
+function InlinePinSection({ event, token, onUpdated }) {
+    const [mode,       setMode]       = useState(null);
     const [pin,        setPin]        = useState("");
     const [currentPin, setCurrentPin] = useState("");
     const [showPin,    setShowPin]    = useState(false);
@@ -289,85 +654,52 @@ function PinSection({ event, token, onUpdated }) {
     }
 
     function reset() {
-        setMode(null);
-        setPin("");
-        setCurrentPin("");
-        setShowPin(false);
-        setPinError(null);
+        setMode(null); setPin(""); setCurrentPin(""); setShowPin(false); setPinError(null);
     }
 
     async function callApi(body) {
-        setSaving(true);
-        setPinError(null);
+        setSaving(true); setPinError(null);
         try {
-            const res = await fetch(`${API}/api/events/${event.id}/pin`, {
+            const res  = await fetch(`${API}/api/events/${event.id}/pin`, {
                 method:  "PATCH",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body:    JSON.stringify(body),
             });
             const json = await res.json();
             if (!json.ok) { setPinError(json.error || "Failed."); return; }
-            onUpdated();
-            reset();
-        } catch {
-            setPinError("Something went wrong.");
-        } finally {
-            setSaving(false);
-        }
+            onUpdated(); reset();
+        } catch { setPinError("Something went wrong."); }
+        finally  { setSaving(false); }
     }
 
     function handleSave() {
         if (pin.length < 4) { setPinError("PIN must be at least 4 digits."); return; }
-        if (mode === "enable") {
-            callApi({ action: "enable", pin });
-        } else {
-            callApi({ action: "change", currentPin, newPin: pin });
-        }
+        callApi(mode === "enable" ? { action: "enable", pin } : { action: "change", currentPin, newPin: pin });
     }
 
     return (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
-            {/* Header row — stacks on mobile */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2.5">
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${event.pinRequired ? "bg-violet-100" : "bg-zinc-100"}`}>
-                        <svg className={`h-4 w-4 ${event.pinRequired ? "text-violet-600" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <p className="text-sm font-medium text-zinc-800">PIN protection</p>
-                        <p className="text-xs text-zinc-400">
-                            {event.pinRequired ? "Guests must enter a PIN to upload." : "Anyone with the link can upload."}
-                        </p>
-                    </div>
+        <div className="mt-4 pt-4 border-t border-zinc-100">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2">
+                    <svg className={`h-3.5 w-3.5 shrink-0 ${event.pinRequired ? "text-violet-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span className="text-xs font-medium text-zinc-600">PIN protection</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${event.pinRequired ? "bg-violet-100 text-violet-700" : "bg-zinc-100 text-zinc-500"}`}>
+                        {event.pinRequired ? "On" : "Off"}
+                    </span>
                 </div>
-
                 {!mode && (
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                         {event.pinRequired ? (
                             <>
                                 <ViewPinButton pin={event.pin} />
-                                <button
-                                    onClick={() => setMode("change")}
-                                    className="cursor-pointer flex-1 sm:flex-none rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors text-center"
-                                >
-                                    Change PIN
-                                </button>
-                                <button
-                                    onClick={() => callApi({ action: "disable" })}
-                                    disabled={saving}
-                                    className="cursor-pointer flex-1 sm:flex-none rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50 text-center"
-                                >
-                                    Remove PIN
-                                </button>
+                                <button onClick={() => setMode("change")} className="cursor-pointer rounded-lg border border-zinc-200 px-2.5 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors">Change</button>
+                                <button onClick={() => callApi({ action: "disable" })} disabled={saving} className="cursor-pointer rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50">Remove</button>
                             </>
                         ) : (
-                            <button
-                                onClick={() => setMode("enable")}
-                                className="cursor-pointer flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors"
-                            >
-                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button onClick={() => setMode("enable")} className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-2.5 py-1 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors">
+                                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
                                 Enable PIN
@@ -378,72 +710,31 @@ function PinSection({ event, token, onUpdated }) {
             </div>
 
             {mode && (
-                <div className="mt-4 rounded-xl border border-zinc-100 bg-zinc-50 p-4 space-y-3">
+                <div className="mt-3 rounded-xl border border-zinc-100 bg-zinc-50 p-4 space-y-3">
                     {pinError && <p className="text-xs text-rose-600">{pinError}</p>}
-
                     {mode === "change" && (
                         <div>
                             <label className="block text-xs font-medium text-zinc-600 mb-1.5">Current PIN</label>
                             <div className="flex items-center gap-2">
-                                <input
-                                    type={showPin ? "text" : "password"}
-                                    value={currentPin}
-                                    onChange={handlePinInput(setCurrentPin)}
-                                    inputMode="numeric"
-                                    placeholder="••••"
-                                    className="flex-1 min-w-0 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPin((v) => !v)}
-                                    className="cursor-pointer shrink-0 text-zinc-400 hover:text-zinc-600 transition-colors"
-                                >
-                                    {showPin ? <EyeOff /> : <EyeOn />}
-                                </button>
+                                <input type={showPin ? "text" : "password"} value={currentPin} onChange={handlePinInput(setCurrentPin)} inputMode="numeric" placeholder="••••" className="flex-1 min-w-0 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200" />
+                                <button type="button" onClick={() => setShowPin(v => !v)} className="cursor-pointer shrink-0 text-zinc-400 hover:text-zinc-600 transition-colors">{showPin ? <EyeOff /> : <EyeOn />}</button>
                             </div>
                         </div>
                     )}
-
                     <div>
                         <label className="block text-xs font-medium text-zinc-600 mb-1.5">
-                            {mode === "change" ? "New PIN" : "PIN"}{" "}
-                            <span className="text-zinc-400 font-normal">(4–8 digits)</span>
+                            {mode === "change" ? "New PIN" : "PIN"} <span className="text-zinc-400 font-normal">(4–8 digits)</span>
                         </label>
                         <div className="flex items-center gap-2">
-                            <input
-                                type={showPin ? "text" : "password"}
-                                value={pin}
-                                onChange={handlePinInput(setPin)}
-                                inputMode="numeric"
-                                placeholder="••••"
-                                autoFocus
-                                className="flex-1 min-w-0 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPin((v) => !v)}
-                                className="cursor-pointer shrink-0 text-zinc-400 hover:text-zinc-600 transition-colors"
-                            >
-                                {showPin ? <EyeOff /> : <EyeOn />}
-                            </button>
+                            <input type={showPin ? "text" : "password"} value={pin} onChange={handlePinInput(setPin)} inputMode="numeric" placeholder="••••" autoFocus className="flex-1 min-w-0 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200" />
+                            <button type="button" onClick={() => setShowPin(v => !v)} className="cursor-pointer shrink-0 text-zinc-400 hover:text-zinc-600 transition-colors">{showPin ? <EyeOff /> : <EyeOn />}</button>
                         </div>
                     </div>
-
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="cursor-pointer rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 disabled:opacity-50 transition-colors"
-                        >
+                        <button onClick={handleSave} disabled={saving} className="cursor-pointer rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 disabled:opacity-50 transition-colors">
                             {saving ? "Saving…" : mode === "change" ? "Change PIN" : "Enable PIN"}
                         </button>
-                        <button
-                            onClick={reset}
-                            disabled={saving}
-                            className="cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
-                        >
-                            Cancel
-                        </button>
+                        <button onClick={reset} disabled={saving} className="cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 transition-colors">Cancel</button>
                     </div>
                 </div>
             )}
@@ -685,10 +976,14 @@ export default function EventDetail() {
                             </div>
 
                             {/* Share */}
-                            <ShareSection event={event} />
+                            <ShareSection
+                                event={event}
+                                token={auth.token}
+                                onUpdated={loadEvent}
+                            />
 
-                            {/* PIN protection */}
-                            <PinSection
+                            {/* Gallery */}
+                            <GallerySection
                                 event={event}
                                 token={auth.token}
                                 onUpdated={loadEvent}
