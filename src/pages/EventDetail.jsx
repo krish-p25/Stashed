@@ -27,10 +27,19 @@ function isImage(mimeType) {
     return mimeType?.startsWith("image/");
 }
 
-function UploadCard({ upload }) {
+function UploadCard({ upload, onStatusChange }) {
+    const [busy, setBusy] = useState(false);
+    const isHidden = upload.status === "hidden";
+
+    async function handleToggle() {
+        setBusy(true);
+        await onStatusChange(upload.id, isHidden ? "approved" : "hidden");
+        setBusy(false);
+    }
+
     return (
-        <div className="flex flex-col gap-2 rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
-            <div className="aspect-square bg-zinc-50 flex items-center justify-center overflow-hidden">
+        <div className={`flex flex-col gap-2 rounded-2xl border bg-white overflow-hidden shadow-sm transition-opacity ${isHidden ? "border-rose-200 opacity-60" : "border-zinc-200"}`}>
+            <div className="relative aspect-square bg-zinc-50 flex items-center justify-center overflow-hidden group">
                 {isImage(upload.mimeType) ? (
                     <img
                         src={upload.fileUrl}
@@ -44,6 +53,39 @@ function UploadCard({ upload }) {
                                 d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                         </svg>
                         <span className="text-xs text-zinc-400 break-all">{upload.mimeType}</span>
+                    </div>
+                )}
+
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center">
+                    <button
+                        onClick={handleToggle}
+                        disabled={busy}
+                        className={`cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow transition-colors disabled:opacity-50 ${isHidden ? "bg-white text-zinc-800 hover:bg-zinc-100" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                    >
+                        {isHidden ? (
+                            <>
+                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                Unhide
+                            </>
+                        ) : (
+                            <>
+                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                </svg>
+                                Hide
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                {/* Hidden badge */}
+                {isHidden && (
+                    <div className="absolute top-1.5 left-1.5 rounded-md bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                        Hidden
                     </div>
                 )}
             </div>
@@ -679,7 +721,7 @@ function InlinePinSection({ event, token, onUpdated }) {
 
     return (
         <div className="mt-4 pt-4 border-t border-zinc-100">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-2 justify-between">
                 <div className="flex items-center gap-2">
                     <svg className={`h-3.5 w-3.5 shrink-0 ${event.pinRequired ? "text-violet-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -853,6 +895,15 @@ export default function EventDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
+    async function updateUploadStatus(uploadId, status) {
+        await fetch(`${API}/api/events/${id}/uploads`, {
+            method:  "PATCH",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+            body:    JSON.stringify({ ids: [uploadId], status }),
+        });
+        loadEvent();
+    }
+
     async function handleDelete() {
         setDeleting(true);
         try {
@@ -1008,7 +1059,7 @@ export default function EventDetail() {
                                 ) : (
                                     <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
                                         {event.uploads.map((upload) => (
-                                            <UploadCard key={upload.id} upload={upload} />
+                                            <UploadCard key={upload.id} upload={upload} onStatusChange={updateUploadStatus} />
                                         ))}
                                     </div>
                                 )}
