@@ -22,11 +22,6 @@ const STATUS_STYLES = {
     pending_drive: "border-violet-200 bg-violet-50 text-violet-600",
 };
 
-const UPLOAD_STATUS_STYLES = {
-    pending:  "border-sky-200 bg-sky-50 text-sky-700",
-    approved: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    hidden:   "border-zinc-200 bg-zinc-100 text-zinc-500",
-};
 
 function isImage(mimeType) {
     return mimeType?.startsWith("image/");
@@ -59,14 +54,9 @@ function UploadCard({ upload }) {
                 {upload.uploaderName && (
                     <p className="text-xs text-zinc-400">{upload.uploaderName}</p>
                 )}
-                <div className="flex items-center justify-between gap-2">
-                    <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${UPLOAD_STATUS_STYLES[upload.status] ?? UPLOAD_STATUS_STYLES.pending}`}>
-                        {fmtStatus(upload.status)}
-                    </span>
-                    <span className="text-xs text-zinc-400">
-                        {new Date(upload.createdAt).toLocaleDateString()}
-                    </span>
-                </div>
+                <p className="text-xs text-zinc-400">
+                    {new Date(upload.createdAt).toLocaleDateString()}
+                </p>
             </div>
         </div>
     );
@@ -375,8 +365,11 @@ function PinSection({ event, token, onUpdated }) {
                         ) : (
                             <button
                                 onClick={() => setMode("enable")}
-                                className="cursor-pointer flex-1 sm:flex-none rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors text-center"
+                                className="cursor-pointer flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors"
                             >
+                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
                                 Enable PIN
                             </button>
                         )}
