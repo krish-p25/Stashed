@@ -8,5 +8,6 @@ export default defineConfig({
         host: true,
         allowedHosts: ['stashed.krishrp.xyz'],
         proxy: { '/api': 'http://127.0.0.1:3001' },
+        headers: { 'Cache-Control': 'no-store' },
     },
 })
