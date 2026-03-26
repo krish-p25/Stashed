@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import confetti from "canvas-confetti";
+import Header from "../components/Header";
+import Glow   from "../components/Glow";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -8,17 +10,6 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 function isImageType(mime) {
     return mime?.startsWith("image/");
-}
-
-// ─── Minimal branded header ──────────────────────────────────────────────────
-
-function TopBar() {
-    return (
-        <div className="flex items-center gap-2 px-5 py-4 border-b border-zinc-100">
-            <img src="/logo_black.png" alt="Stashed" className="h-7 w-7" />
-            <span className="text-sm font-semibold text-zinc-800">Stashed</span>
-        </div>
-    );
 }
 
 // ─── PIN gate ────────────────────────────────────────────────────────────────
@@ -467,10 +458,11 @@ export default function Upload() {
     }, [userId, slug]);
 
     return (
-        <div className="min-h-screen bg-white">
-            <TopBar />
+        <div className="min-h-screen">
+            <Glow />
+            <Header />
 
-            <div className={`transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
+            <div className={`pt-24 sm:pt-28 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
                 {phase === "loading" && (
                     <div className="flex items-center justify-center min-h-[70vh]">
                         <div className="h-6 w-6 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
