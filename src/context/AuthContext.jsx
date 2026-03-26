@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
-
-const AuthContext = createContext(null);
+import { useState } from "react";
+import { AuthContext } from "./auth-context";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -13,23 +12,25 @@ function isTokenValid(token) {
   }
 }
 
-export function AuthProvider({ children }) {
-  const [token,        setToken]        = useState(null);
-  const [user,         setUser]         = useState(null);
-  const [initializing, setInitializing] = useState(true);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser  = localStorage.getItem("user");
-    if (storedToken && isTokenValid(storedToken)) {
-      setToken(storedToken);
-      try { setUser(JSON.parse(storedUser)); } catch { /* ignore */ }
-    } else {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+function readAuthFromStorage() {
+  const storedToken = localStorage.getItem("token");
+  const storedUser = localStorage.getItem("user");
+  if (storedToken && isTokenValid(storedToken)) {
+    let parsedUser = null;
+    try {
+      parsedUser = storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      /* ignore */
     }
-    setInitializing(false);
-  }, []);
+    return { token: storedToken, user: parsedUser };
+  }
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  return { token: null, user: null };
+}
+
+export function AuthProvider({ children }) {
+  const [{ token, user }, setAuth] = useState(() => readAuthFromStorage());
 
   async function login(email, password) {
     const res  = await fetch(`${API}/api/auth/login`, {
@@ -41,24 +42,28 @@ export function AuthProvider({ children }) {
     if (!data.ok) throw new Error(data.error || "Login failed.");
     localStorage.setItem("token", data.token);
     localStorage.setItem("user",  JSON.stringify(data.user));
-    setToken(data.token);
-    setUser(data.user);
+    setAuth({ token: data.token, user: data.user });
   }
 
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
+    setAuth({ token: null, user: null });
+  }
+
+  function updateUser(partial) {
+    setAuth((prev) => {
+      const next = { ...prev.user, ...partial };
+      localStorage.setItem("user", JSON.stringify(next));
+      return { ...prev, user: next };
+    });
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, initializing }}>
+    <AuthContext.Provider
+      value={{ user, token, login, logout, updateUser, initializing: false }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }
