@@ -110,14 +110,15 @@ const STATUS_ICON = {
 };
 
 function FileTile({ file, status }) {
-    const preview = useMemo(() => {
-        if (!isImageType(file.type)) return null;
-        return URL.createObjectURL(file);
-    }, [file]);
+    const preview = useMemo(
+        () => (isImageType(file.type) ? URL.createObjectURL(file) : null),
+        [file]
+    );
 
     useEffect(() => {
-        if (!preview) return;
-        return () => URL.revokeObjectURL(preview);
+        return () => {
+            if (preview) URL.revokeObjectURL(preview);
+        };
     }, [preview]);
 
     return (
@@ -258,7 +259,7 @@ function UploadForm({ event, pin, onDone }) {
                     accept="image/*,video/*"
                     multiple
                     className="hidden"
-                    onChange={(e) => addFiles(e.target.files)}
+                    onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }}
                 />
             </div>
 
