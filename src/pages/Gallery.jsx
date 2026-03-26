@@ -1,18 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import Header from "../components/Header";
+import Glow   from "../components/Glow";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
-
-function TopBar() {
-    return (
-        <header className="fixed inset-x-0 top-0 z-20 flex items-center px-4 py-3 sm:px-8 bg-white/80 backdrop-blur-md border-b border-zinc-100">
-            <Link to="/" className="flex items-center gap-2">
-                <img src="/logo_black.png" alt="Stashed" className="h-6 w-6" />
-                <span className="text-sm font-semibold text-zinc-800 tracking-wide">Stashed</span>
-            </Link>
-        </header>
-    );
-}
 
 function Spinner() {
     return (
@@ -34,7 +25,7 @@ function PinGate({ onSubmit, error, loading }) {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+        <div className="flex items-center justify-center min-h-[calc(100vh-96px)]">
             <div className="w-full max-w-sm mx-auto px-4">
                 <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm text-center space-y-5">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 mx-auto">
@@ -120,9 +111,10 @@ export default function Gallery() {
     }
 
     return (
-        <div className="min-h-screen bg-white text-zinc-900">
-            <TopBar />
-            <main className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="min-h-screen text-zinc-900">
+            <Glow />
+            <Header />
+            <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
                 {loading && <Spinner />}
 
                 {error && (
