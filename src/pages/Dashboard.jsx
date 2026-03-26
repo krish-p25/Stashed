@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -114,6 +114,7 @@ export default function Dashboard() {
                 const json = await res.json();
                 if (!json.ok) throw new Error(json.error || "Failed to load dashboard.");
                 setData(json);
+                auth.updateUser(json.user);
             } catch (err) {
                 setError(err.message);
             } finally {
