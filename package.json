@@ -11,6 +11,8 @@
         "deploy": "vite build && scp -r dist/. Administrator@13.42.39.116:\"C:/inetpub/stashed/\""
     },
     "dependencies": {
+        "@stripe/react-stripe-js": "^6.0.0",
+        "@stripe/stripe-js": "^9.0.0",
         "canvas-confetti": "^1.9.4",
         "qrcode.react": "^4.2.0",
         "react": "^19.2.0",
