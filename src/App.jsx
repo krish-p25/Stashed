@@ -7,7 +7,9 @@ import HowItWorks  from "./pages/HowItWorks.jsx";
 import UseCases    from "./pages/UseCases.jsx";
 import Contact     from "./pages/Contact.jsx";
 import Privacy     from "./pages/Privacy.jsx";
-import Login       from "./pages/Login";
+import Login          from "./pages/Login";
+import Signup         from "./pages/Signup";
+import SignupSuccess   from "./pages/SignupSuccess";
 import Dashboard   from "./pages/Dashboard";
 import EventDetail from "./pages/EventDetail";
 import CreateEvent from "./pages/CreateEvent";
@@ -25,7 +27,9 @@ export default function App() {
                     <Route path="/use-cases"  element={<UseCases />} />
                     <Route path="/contact"    element={<Contact />} />
                     <Route path="/privacy"    element={<Privacy />} />
-                    <Route path="/login"      element={<Login />} />
+                    <Route path="/login"          element={<Login />} />
+                    <Route path="/signup"         element={<Signup />} />
+                    <Route path="/signup/success" element={<SignupSuccess />} />
                     <Route path="/upload/:userId/:slug"  element={<Upload />} />
                     <Route path="/gallery/:userId/:slug" element={<Gallery />} />
 
