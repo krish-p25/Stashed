@@ -73,56 +73,172 @@ function StepBar({ step }) {
 // ── Shared input style ────────────────────────────────────────────────────────
 const inputCls = "w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-200 transition-colors";
 
+// ── Animated reveal (height + fade) ──────────────────────────────────────────
+// Uses CSS grid trick: grid-rows-[0fr]→[1fr] collapses/expands without knowing height.
+function Reveal({ show, children }) {
+    return (
+        <div className={`grid transition-all duration-300 ${show ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+            <div className="overflow-hidden">{children}</div>
+        </div>
+    );
+}
+
+// ── Password strength ─────────────────────────────────────────────────────────
+const PASSWORD_CRITERIA = [
+    { id: "length",    label: "At least 8 characters",  test: p => p.length >= 8 },
+    { id: "lowercase", label: "One lowercase letter",   test: p => /[a-z]/.test(p) },
+    { id: "uppercase", label: "One uppercase letter",   test: p => /[A-Z]/.test(p) },
+    { id: "number",    label: "One number",             test: p => /[0-9]/.test(p) },
+    { id: "special",   label: "One special character",  test: p => /[^A-Za-z0-9]/.test(p) },
+];
+
+const STRENGTH_META = [
+    null,
+    { label: "Weak",    bar: "bg-rose-400",    text: "text-rose-500"    },
+    { label: "Fair",    bar: "bg-orange-400",  text: "text-orange-500"  },
+    { label: "Good",    bar: "bg-yellow-400",  text: "text-yellow-600"  },
+    { label: "Strong",  bar: "bg-lime-500",    text: "text-lime-600"    },
+    { label: "Strong",  bar: "bg-emerald-500", text: "text-emerald-600" },
+];
+
+function CriterionRow({ met, label }) {
+    return (
+        <div className={`flex items-center gap-2 transition-colors duration-300 ${met ? "text-emerald-600" : "text-zinc-400"}`}>
+            {/* Icon: crossfade between hollow circle and filled checkmark */}
+            <div className="relative h-3.5 w-3.5 shrink-0">
+                <svg className={`absolute inset-0 transition-all duration-200 ${met ? "opacity-0 scale-50" : "opacity-100 scale-100"}`}
+                     viewBox="0 0 14 14" fill="none">
+                    <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+                <svg className={`absolute inset-0 transition-all duration-200 ${met ? "opacity-100 scale-100" : "opacity-0 scale-50"}`}
+                     viewBox="0 0 14 14" fill="none">
+                    <circle cx="7" cy="7" r="7" fill="currentColor" opacity="0.15" />
+                    <path d="M3.5 7L6 9.5L10.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </div>
+            <span className="text-xs transition-colors duration-300">{label}</span>
+        </div>
+    );
+}
+
+function PasswordStrength({ password }) {
+    const score = PASSWORD_CRITERIA.filter(c => c.test(password)).length;
+    const meta  = STRENGTH_META[score];
+    return (
+        <div className="space-y-2 pt-1.5">
+            <div className="flex items-center gap-2">
+                <div className="flex flex-1 gap-1">
+                    {PASSWORD_CRITERIA.map((_, i) => (
+                        <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < score ? meta.bar : "bg-zinc-200"}`} />
+                    ))}
+                </div>
+                <Reveal show={score > 0}>
+                    <span className={`text-xs font-medium pl-1 transition-colors duration-300 ${meta?.text ?? ""}`}>
+                        {meta?.label}
+                    </span>
+                </Reveal>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                {PASSWORD_CRITERIA.map(({ id, label, test }) => (
+                    <CriterionRow key={id} met={test(password)} label={label} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// ── Inline status icon (check / cross / spinner) ─────────────────────────────
+function StatusIcon({ status }) {
+    if (status === "checking") return (
+        <span className="h-3.5 w-3.5 rounded-full border-2 border-zinc-300 border-t-zinc-500 animate-spin block" />
+    );
+    if (status === "available" || status === "match") return (
+        <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+    );
+    if (status === "taken" || status === "mismatch") return (
+        <svg className="h-4 w-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    );
+    return null;
+}
+
+function fieldBorderCls(status) {
+    if (status === "taken"     || status === "mismatch") return "border-rose-300    focus:border-rose-400    focus:ring-rose-200";
+    if (status === "available" || status === "match")    return "border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100";
+    return "";
+}
+
 // ── Step 1: Details ───────────────────────────────────────────────────────────
 function DetailsStep({ form, setForm, onNext }) {
-    const [error,       setError]       = useState(null);
-    const [showPass,    setShowPass]    = useState(false);
+    const [error,        setError]        = useState(null);
+    const [showPass,     setShowPass]     = useState(false);
     // "idle" | "checking" | "available" | "taken"
-    const [userStatus,  setUserStatus]  = useState("idle");
-    const [suggestions, setSuggestions] = useState([]);
-    const debounceRef = useRef(null);
+    const [userStatus,   setUserStatus]   = useState("idle");
+    const [emailStatus,  setEmailStatus]  = useState("idle");
+    const [suggestions,  setSuggestions]  = useState([]);
+    const userDebounce  = useRef(null);
+    const emailDebounce = useRef(null);
 
     // Debounced username check
     useEffect(() => {
         const username = form.username.trim();
         const valid    = username.length >= 3 && username.length <= 32;
-
-        clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(async () => {
-            if (!valid) {
-                setUserStatus("idle");
-                setSuggestions([]);
-                return;
-            }
+        clearTimeout(userDebounce.current);
+        userDebounce.current = setTimeout(async () => {
+            if (!valid) { setUserStatus("idle"); setSuggestions([]); return; }
             setUserStatus("checking");
             try {
                 const res  = await fetch(`${API}/api/auth/check-username?username=${encodeURIComponent(username)}`);
                 const json = await res.json();
-                if (json.available) {
-                    setUserStatus("available");
-                    setSuggestions([]);
-                } else {
-                    setUserStatus("taken");
-                    setSuggestions(json.suggestions ?? []);
-                }
-            } catch {
-                setUserStatus("idle");
-            }
+                if (json.available) { setUserStatus("available"); setSuggestions([]); }
+                else                { setUserStatus("taken");     setSuggestions(json.suggestions ?? []); }
+            } catch { setUserStatus("idle"); }
         }, valid ? 500 : 0);
-
-        return () => clearTimeout(debounceRef.current);
+        return () => clearTimeout(userDebounce.current);
     }, [form.username]);
 
+    // Debounced email check
+    useEffect(() => {
+        const email = form.email.trim();
+        const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        clearTimeout(emailDebounce.current);
+        emailDebounce.current = setTimeout(async () => {
+            if (!valid) { setEmailStatus("idle"); return; }
+            setEmailStatus("checking");
+            try {
+                const res  = await fetch(`${API}/api/auth/check-email?email=${encodeURIComponent(email)}`);
+                const json = await res.json();
+                setEmailStatus(json.available ? "available" : "taken");
+            } catch { setEmailStatus("idle"); }
+        }, valid ? 500 : 0);
+        return () => clearTimeout(emailDebounce.current);
+    }, [form.email]);
+
+    // Derived validity — drives button style and blocks handleNext
+    const passwordsMatch = form.password.length > 0 && form.password === form.confirmPassword;
+    const confirmStatus  = form.confirmPassword.length === 0 ? "idle"
+                         : passwordsMatch ? "match" : "mismatch";
+
+    const isFormValid = (
+        userStatus  === "available" &&
+        emailStatus === "available" &&
+        form.password.length >= 8   &&
+        passwordsMatch
+    );
+
     function validate() {
-        if (!form.username.trim()) return "Username is required.";
-        if (form.username.trim().length < 3) return "Username must be at least 3 characters.";
+        if (!form.username.trim() || form.username.trim().length < 3) return "Username must be at least 3 characters.";
         if (form.username.trim().length > 32) return "Username must be 32 characters or fewer.";
-        if (userStatus === "taken") return "This username is already taken.";
-        if (!form.email.trim()) return "Email is required.";
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "Enter a valid email address.";
-        if (!form.password) return "Password is required.";
-        if (form.password.length < 8) return "Password must be at least 8 characters.";
-        if (form.password !== form.confirmPassword) return "Passwords do not match.";
+        if (userStatus  === "taken")     return "This username is already taken.";
+        if (userStatus  === "checking")  return "Please wait — checking username.";
+        if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "Enter a valid email address.";
+        if (emailStatus === "taken")     return "An account with this email already exists.";
+        if (emailStatus === "checking")  return "Please wait — checking email.";
+        if (form.password.length < 8)   return "Password must be at least 8 characters.";
+        if (!passwordsMatch)             return "Passwords do not match.";
         return null;
     }
 
@@ -138,17 +254,17 @@ function DetailsStep({ form, setForm, onNext }) {
             <div>
                 <h1 className="text-2xl font-bold text-zinc-900">Create your account</h1>
                 <p className="mt-1 text-sm text-zinc-500">Get started in under a minute.</p>
+                <Reveal show={!!error}>
+                    <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 mt-4">
+                        {error}
+                    </div>
+                </Reveal>
             </div>
 
             <StepBar step="details" />
 
-            {error && (
-                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                    {error}
-                </div>
-            )}
-
             <div className="space-y-3">
+                {/* Username */}
                 <div>
                     <label className="block text-xs font-medium text-zinc-700 mb-1.5">Username</label>
                     <div className="relative flex items-center">
@@ -159,30 +275,13 @@ function DetailsStep({ form, setForm, onNext }) {
                             placeholder="yourname"
                             autoComplete="username"
                             autoFocus
-                            className={`${inputCls} pr-8 ${
-                                userStatus === "taken"     ? "border-rose-300 focus:border-rose-400 focus:ring-rose-200" :
-                                userStatus === "available" ? "border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100" :
-                                ""
-                            }`}
+                            className={`${inputCls} pr-8 ${fieldBorderCls(userStatus)}`}
                         />
                         <span className="absolute right-3 pointer-events-none">
-                            {userStatus === "checking" && (
-                                <span className="h-3.5 w-3.5 rounded-full border-2 border-zinc-300 border-t-zinc-500 animate-spin block" />
-                            )}
-                            {userStatus === "available" && (
-                                <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            )}
-                            {userStatus === "taken" && (
-                                <svg className="h-4 w-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            )}
+                            <StatusIcon status={userStatus} />
                         </span>
                     </div>
-
-                    {userStatus === "taken" && (
+                    <Reveal show={userStatus === "taken"}>
                         <div className="mt-2 space-y-1.5">
                             <p className="text-xs text-rose-600">That username is taken.</p>
                             {suggestions.length > 0 && (
@@ -201,22 +300,34 @@ function DetailsStep({ form, setForm, onNext }) {
                                 </div>
                             )}
                         </div>
-                    )}
-                    {userStatus === "available" && (
+                    </Reveal>
+                    <Reveal show={userStatus === "available"}>
                         <p className="mt-1.5 text-xs text-emerald-600">Username is available.</p>
-                    )}
+                    </Reveal>
                 </div>
+
+                {/* Email */}
                 <div>
                     <label className="block text-xs font-medium text-zinc-700 mb-1.5">Email</label>
-                    <input
-                        type="email"
-                        value={form.email}
-                        onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                        placeholder="you@example.com"
-                        autoComplete="email"
-                        className={inputCls}
-                    />
+                    <div className="relative flex items-center">
+                        <input
+                            type="email"
+                            value={form.email}
+                            onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                            placeholder="you@example.com"
+                            autoComplete="email"
+                            className={`${inputCls} pr-8 ${fieldBorderCls(emailStatus)}`}
+                        />
+                        <span className="absolute right-3 pointer-events-none">
+                            <StatusIcon status={emailStatus} />
+                        </span>
+                    </div>
+                    <Reveal show={emailStatus === "taken"}>
+                        <p className="mt-1.5 text-xs text-rose-600">An account with this email already exists.</p>
+                    </Reveal>
                 </div>
+
+                {/* Password + strength meter */}
                 <div>
                     <label className="block text-xs font-medium text-zinc-700 mb-1.5">Password</label>
                     <div className="relative flex items-center">
@@ -236,24 +347,39 @@ function DetailsStep({ form, setForm, onNext }) {
                             {showPass ? <EyeOff /> : <EyeOn />}
                         </button>
                     </div>
+                    <Reveal show={form.password.length > 0}>
+                        <PasswordStrength password={form.password} />
+                    </Reveal>
                 </div>
+
+                {/* Confirm password */}
                 <div>
                     <label className="block text-xs font-medium text-zinc-700 mb-1.5">Confirm password</label>
-                    <input
-                        type={showPass ? "text" : "password"}
-                        value={form.confirmPassword}
-                        onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                        placeholder="Repeat your password"
-                        autoComplete="new-password"
-                        onKeyDown={e => e.key === "Enter" && handleNext()}
-                        className={inputCls}
-                    />
+                    <div className="relative flex items-center">
+                        <input
+                            type={showPass ? "text" : "password"}
+                            value={form.confirmPassword}
+                            onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                            placeholder="Repeat your password"
+                            autoComplete="new-password"
+                            onKeyDown={e => e.key === "Enter" && isFormValid && handleNext()}
+                            className={`${inputCls} pr-8 ${fieldBorderCls(confirmStatus)}`}
+                        />
+                        <span className="absolute right-3 pointer-events-none">
+                            <StatusIcon status={confirmStatus} />
+                        </span>
+                    </div>
                 </div>
             </div>
 
             <button
                 onClick={handleNext}
-                className="w-full cursor-pointer rounded-2xl bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
+                disabled={!isFormValid}
+                className={`w-full rounded-2xl py-3 text-sm font-semibold text-white transition-all duration-300 ${
+                    isFormValid
+                        ? "cursor-pointer bg-violet-600 hover:bg-violet-700 shadow-sm"
+                        : "cursor-not-allowed bg-zinc-300"
+                }`}
             >
                 Continue →
             </button>
@@ -295,11 +421,11 @@ function UseCaseStep({ form, setForm, onNext, onBack }) {
 
             <StepBar step="usecase" />
 
-            {error && (
-                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <Reveal show={!!error}>
+                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 -mt-2 mb-1">
                     {error}
                 </div>
-            )}
+            </Reveal>
 
             <div className="space-y-4">
                 <div>
@@ -405,11 +531,11 @@ function PlanStep({ form, onBack, onProceed }) {
 
             <StepBar step="plan" />
 
-            {error && (
-                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <Reveal show={!!error}>
+                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 -mt-2 mb-1">
                     {error}
                 </div>
-            )}
+            </Reveal>
 
             {/* Plan card */}
             <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-5 space-y-4">
