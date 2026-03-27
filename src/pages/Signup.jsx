@@ -1,11 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { loadStripe } from "@stripe/stripe-js";
+import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
-const STEPS = ["details", "usecase", "plan"];
+const STEPS = ["details", "usecase", "plan", "checkout"];
 
 const EVENT_TYPES = [
     { id: "celebrations", label: "🎊 Celebrations" },
@@ -72,13 +75,49 @@ const inputCls = "w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.
 
 // ── Step 1: Details ───────────────────────────────────────────────────────────
 function DetailsStep({ form, setForm, onNext }) {
-    const [error,    setError]    = useState(null);
-    const [showPass, setShowPass] = useState(false);
+    const [error,       setError]       = useState(null);
+    const [showPass,    setShowPass]    = useState(false);
+    // "idle" | "checking" | "available" | "taken"
+    const [userStatus,  setUserStatus]  = useState("idle");
+    const [suggestions, setSuggestions] = useState([]);
+    const debounceRef = useRef(null);
+
+    // Debounced username check
+    useEffect(() => {
+        const username = form.username.trim();
+        const valid    = username.length >= 3 && username.length <= 32;
+
+        clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(async () => {
+            if (!valid) {
+                setUserStatus("idle");
+                setSuggestions([]);
+                return;
+            }
+            setUserStatus("checking");
+            try {
+                const res  = await fetch(`${API}/api/auth/check-username?username=${encodeURIComponent(username)}`);
+                const json = await res.json();
+                if (json.available) {
+                    setUserStatus("available");
+                    setSuggestions([]);
+                } else {
+                    setUserStatus("taken");
+                    setSuggestions(json.suggestions ?? []);
+                }
+            } catch {
+                setUserStatus("idle");
+            }
+        }, valid ? 500 : 0);
+
+        return () => clearTimeout(debounceRef.current);
+    }, [form.username]);
 
     function validate() {
         if (!form.username.trim()) return "Username is required.";
         if (form.username.trim().length < 3) return "Username must be at least 3 characters.";
         if (form.username.trim().length > 32) return "Username must be 32 characters or fewer.";
+        if (userStatus === "taken") return "This username is already taken.";
         if (!form.email.trim()) return "Email is required.";
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "Enter a valid email address.";
         if (!form.password) return "Password is required.";
@@ -112,15 +151,60 @@ function DetailsStep({ form, setForm, onNext }) {
             <div className="space-y-3">
                 <div>
                     <label className="block text-xs font-medium text-zinc-700 mb-1.5">Username</label>
-                    <input
-                        type="text"
-                        value={form.username}
-                        onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                        placeholder="yourname"
-                        autoComplete="username"
-                        autoFocus
-                        className={inputCls}
-                    />
+                    <div className="relative flex items-center">
+                        <input
+                            type="text"
+                            value={form.username}
+                            onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
+                            placeholder="yourname"
+                            autoComplete="username"
+                            autoFocus
+                            className={`${inputCls} pr-8 ${
+                                userStatus === "taken"     ? "border-rose-300 focus:border-rose-400 focus:ring-rose-200" :
+                                userStatus === "available" ? "border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100" :
+                                ""
+                            }`}
+                        />
+                        <span className="absolute right-3 pointer-events-none">
+                            {userStatus === "checking" && (
+                                <span className="h-3.5 w-3.5 rounded-full border-2 border-zinc-300 border-t-zinc-500 animate-spin block" />
+                            )}
+                            {userStatus === "available" && (
+                                <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            )}
+                            {userStatus === "taken" && (
+                                <svg className="h-4 w-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            )}
+                        </span>
+                    </div>
+
+                    {userStatus === "taken" && (
+                        <div className="mt-2 space-y-1.5">
+                            <p className="text-xs text-rose-600">That username is taken.</p>
+                            {suggestions.length > 0 && (
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-xs text-zinc-400">Try:</span>
+                                    {suggestions.map(s => (
+                                        <button
+                                            key={s}
+                                            type="button"
+                                            onClick={() => setForm(f => ({ ...f, username: s }))}
+                                            className="cursor-pointer rounded-lg border border-violet-200 bg-violet-50 px-2.5 py-1 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors"
+                                        >
+                                            {s}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {userStatus === "available" && (
+                        <p className="mt-1.5 text-xs text-emerald-600">Username is available.</p>
+                    )}
                 </div>
                 <div>
                     <label className="block text-xs font-medium text-zinc-700 mb-1.5">Email</label>
@@ -284,7 +368,7 @@ function UseCaseStep({ form, setForm, onNext, onBack }) {
 }
 
 // ── Step 3: Plan ──────────────────────────────────────────────────────────────
-function PlanStep({ form, onBack }) {
+function PlanStep({ form, onBack, onProceed }) {
     const [loading, setLoading] = useState(false);
     const [error,   setError]   = useState(null);
 
@@ -305,7 +389,7 @@ function PlanStep({ form, onBack }) {
             });
             const json = await res.json();
             if (!json.ok) { setError(json.error || "Something went wrong."); setLoading(false); return; }
-            window.location.href = json.url;
+            onProceed(json.clientSecret);
         } catch {
             setError("Could not connect. Please try again.");
             setLoading(false);
@@ -382,7 +466,7 @@ function PlanStep({ form, onBack }) {
                     {loading ? (
                         <>
                             <div className="h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-                            Redirecting…
+                            Loading…
                         </>
                     ) : (
                         <>
@@ -403,11 +487,38 @@ function PlanStep({ form, onBack }) {
     );
 }
 
+// ── Step 4: Embedded checkout ─────────────────────────────────────────────────
+function CheckoutStep({ clientSecret, onBack }) {
+    return (
+        <div className="space-y-5">
+            <div className="flex items-center gap-3">
+                <button
+                    onClick={onBack}
+                    className="cursor-pointer flex-none rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+                >
+                    ← Back
+                </button>
+                <div>
+                    <h1 className="text-xl font-bold text-zinc-900">Complete your payment</h1>
+                    <p className="text-xs text-zinc-500">Secured by Stripe</p>
+                </div>
+            </div>
+
+            <StepBar step="checkout" />
+
+            <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret }}>
+                <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+        </div>
+    );
+}
+
 // ── Main Signup component ─────────────────────────────────────────────────────
 export default function Signup() {
-    const [step,    setStep]    = useState("details");
-    const [visible, setVisible] = useState(true);
-    const [form,    setForm]    = useState({
+    const [step,         setStep]         = useState("details");
+    const [visible,      setVisible]      = useState(true);
+    const [clientSecret, setClientSecret] = useState(null);
+    const [form,         setForm]         = useState({
         username:        "",
         email:           "",
         password:        "",
@@ -428,12 +539,19 @@ export default function Signup() {
         }, needsScroll ? 400 : 0);
     }, []);
 
+    function handleProceedToCheckout(secret) {
+        setClientSecret(secret);
+        transitionTo("checkout");
+    }
+
+    const isCheckout = step === "checkout";
+
     return (
         <div className="min-h-screen">
             <Glow />
             <Header />
             <div className={`pt-24 sm:pt-28 pb-16 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
-                <div className="mx-auto max-w-md px-4">
+                <div className={`mx-auto px-4 transition-all duration-500 ${isCheckout ? "max-w-2xl" : "max-w-md"}`}>
                     <div className="rounded-2xl border border-zinc-200 bg-white/90 backdrop-blur-sm p-6 sm:p-8 shadow-sm">
                         {step === "details" && (
                             <DetailsStep
@@ -454,6 +572,13 @@ export default function Signup() {
                             <PlanStep
                                 form={form}
                                 onBack={() => transitionTo("usecase")}
+                                onProceed={handleProceedToCheckout}
+                            />
+                        )}
+                        {step === "checkout" && (
+                            <CheckoutStep
+                                clientSecret={clientSecret}
+                                onBack={() => transitionTo("plan")}
                             />
                         )}
                     </div>
