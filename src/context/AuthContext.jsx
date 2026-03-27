@@ -51,6 +51,12 @@ export function AuthProvider({ children }) {
     setAuth({ token: null, user: null });
   }
 
+  function loginWithToken(token, user) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user",  JSON.stringify(user));
+    setAuth({ token, user });
+  }
+
   function updateUser(partial) {
     setAuth((prev) => {
       const next = { ...prev.user, ...partial };
@@ -61,7 +67,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, updateUser, initializing: false }}
+      value={{ user, token, login, logout, updateUser, loginWithToken, initializing: false }}
     >
       {children}
     </AuthContext.Provider>
