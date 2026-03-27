@@ -91,10 +91,10 @@ export default function Header() {
                                 </button>
                             ) : (
                                 <a
-                                    href="/contact"
+                                    href="/signup"
                                     className="ml-3 inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 transition-colors duration-200"
                                 >
-                                    Get early access
+                                    Sign Up
                                 </a>
                             )}
                         </nav>
@@ -103,10 +103,10 @@ export default function Header() {
                         <div className="flex items-center gap-2 md:hidden">
                             {!token && (
                                 <a
-                                    href="/contact"
+                                    href="/signup"
                                     className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors duration-200"
                                 >
-                                    Get access
+                                    Sign Up
                                 </a>
                             )}
                             <button
