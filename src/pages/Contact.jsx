@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -29,6 +30,11 @@ function MiniCard({ title, desc }) {
 const inputClass = "mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-500 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-colors";
 
 export default function Contact() {
+    useSEO({
+        title: "Contact — Get in Touch with Stashed",
+        description: "Get in touch with the Stashed team. Questions about our shared photo album platform, event media collection, or partnership enquiries — we'd love to hear from you.",
+        canonical: "/contact",
+    });
     const [status, setStatus] = useState("idle");
     const [errorMsg, setErrorMsg] = useState("");
 
