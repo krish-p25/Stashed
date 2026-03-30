@@ -4,6 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
@@ -641,6 +642,11 @@ function CheckoutStep({ clientSecret, onBack }) {
 
 // ── Main Signup component ─────────────────────────────────────────────────────
 export default function Signup() {
+    useSEO({
+        title: "Sign Up — Start Collecting Event Photos & Videos",
+        description: "Create your Stashed account and start collecting photos and videos from your event guests in minutes. No app required for guests — just a QR code or link.",
+        canonical: "/signup",
+    });
     const [step,         setStep]         = useState("details");
     const [visible,      setVisible]      = useState(true);
     const [clientSecret, setClientSecret] = useState(null);
