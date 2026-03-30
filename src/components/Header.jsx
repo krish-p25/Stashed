@@ -7,7 +7,7 @@ export default function Header() {
     const [menuOpenPath, setMenuOpenPath] = useState(null);
     const { pathname } = useLocation();
     const navigate     = useNavigate();
-    const { token, logout } = useAuth();
+    const { token, user, logout } = useAuth();
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 50);
@@ -30,6 +30,7 @@ export default function Header() {
     const authedLinks = [
         { href: "/dashboard",            label: "Dashboard"  },
         { href: "/dashboard/events/new", label: "New Event"  },
+        ...(user?.isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
     ];
 
     const navLinks = token ? authedLinks : guestLinks;
