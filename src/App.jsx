@@ -12,6 +12,7 @@ import Signup         from "./pages/Signup";
 import SignupSuccess   from "./pages/SignupSuccess";
 import Dashboard   from "./pages/Dashboard";
 import Admin       from "./pages/Admin";
+import Profile     from "./pages/Profile";
 import EventDetail from "./pages/EventDetail";
 import CreateEvent from "./pages/CreateEvent";
 import Upload     from "./pages/Upload";
@@ -39,6 +40,7 @@ export default function App() {
                         <Route path="/dashboard/events/new"       element={<CreateEvent />} />
                         <Route path="/dashboard/events/:id"       element={<EventDetail />} />
                         <Route path="/admin"                      element={<Admin />} />
+                        <Route path="/profile"                    element={<Profile />} />
                     </Route>
 
                     <Route path="*" element={<Navigate to="/" replace />} />
