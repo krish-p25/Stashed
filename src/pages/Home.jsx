@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -155,6 +156,23 @@ function ReviewsScroller() {
 
 
 export default function Home() {
+    useSEO({
+        title: "Collect Event Photos & Videos — Shared Photo Album App",
+        description: "Stashed is the easiest shared photo album for events. Share a QR code or link, guests upload photos & videos instantly — no app needed. Perfect for weddings, parties, corporate events and conferences.",
+        canonical: "/",
+        jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Stashed — Shared Photo Album & Event Media Collection",
+            "description": "Collect photos and videos from event guests via QR code or link. No app download required. Review, moderate and download everything after your event.",
+            "url": "https://stashed.krishrp.xyz/",
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashed.krishrp.xyz/" }]
+            }
+        }
+    });
+
     return (
         <div className="min-h-screen text-zinc-900">
             <Glow />
