@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -16,6 +17,26 @@ function FeatureCard({ title, desc }) {
 }
 
 export default function Features() {
+    useSEO({
+        title: "Features — Photo & Video Collection for Events",
+        description: "QR code guest uploads, photo and video moderation, bulk downloads, Google Drive sync, PIN-protected galleries and more. Everything you need to collect event media in one shared photo album.",
+        canonical: "/features",
+        jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Stashed Features — Event Photo & Video Collection Platform",
+            "description": "Full feature list for Stashed: QR code uploads, moderation, bulk downloads, Google Drive sync, multiple events management.",
+            "url": "https://stashed.krishrp.xyz/features",
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashed.krishrp.xyz/" },
+                    { "@type": "ListItem", "position": 2, "name": "Features", "item": "https://stashed.krishrp.xyz/features" }
+                ]
+            }
+        }
+    });
+
     return (
         <div className="min-h-screen text-zinc-900">
             <Glow />
