@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -30,6 +31,46 @@ function MiniCard({ title, desc }) {
 }
 
 export default function HowItWorks() {
+    useSEO({
+        title: "How to Collect Photos & Videos from Event Guests",
+        description: "Create an event, share a QR code or link, and guests upload photos and videos instantly — no app needed. See how Stashed makes collecting event media effortless in 3 simple steps.",
+        canonical: "/how-it-works",
+        jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to collect photos and videos from event guests using Stashed",
+            "description": "A 3-step guide to collecting photos and videos from guests at weddings, parties, corporate events and more.",
+            "url": "https://stashed.krishrp.xyz/how-it-works",
+            "step": [
+                {
+                    "@type": "HowToStep",
+                    "position": 1,
+                    "name": "Create an event",
+                    "text": "Create an event page in seconds. Set a name, optional PIN, and upload limits."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 2,
+                    "name": "Share a QR code or link",
+                    "text": "Print a QR for tables or share the link in WhatsApp. Guests open it instantly on their phone — no app download or login required."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 3,
+                    "name": "Review and download",
+                    "text": "All uploads arrive in one place. Approve, hide, or feature them. Download everything after the event as a batch."
+                }
+            ],
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashed.krishrp.xyz/" },
+                    { "@type": "ListItem", "position": 2, "name": "How it works", "item": "https://stashed.krishrp.xyz/how-it-works" }
+                ]
+            }
+        }
+    });
+
     return (
         <div className="min-h-screen text-zinc-900">
             <Glow />
