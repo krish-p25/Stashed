@@ -2,32 +2,202 @@
 <html lang="en">
 
 <head>
-    <!-- Basic -->
+    <!-- ── Core ──────────────────────────────────────────────────────────────── -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stashed — Media Collection</title>
-    <link rel="icon" href="/icon.ico" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <!-- Primary SEO -->
+    <!-- ── Primary SEO ───────────────────────────────────────────────────────── -->
+    <title>Stashed — Collect Event Photos & Videos | Shared Photo Album App</title>
     <meta name="description"
-        content="Collect photos and videos from your event in one simple place. Share a link or QR code and let guests upload instantly." />
+        content="Stashed is the easiest way to collect photos and videos from your event guests. Share a QR code or link, guests upload instantly — no app needed. Perfect for weddings, parties, corporate events and more." />
     <meta name="keywords"
-        content="event media collection, photo sharing for events, wedding guest photos, QR code photo upload, event gallery" />
+        content="photo album, shared photo album, online photo album, collaborative photo album, event photo sharing, collect photos from guests, wedding photo album, wedding guest photos, event gallery, event media collection, video platform, photo and video sharing, QR code photo upload, guest upload app, event photography platform, media collection app, photo sharing app, event photo album, digital photo album, group photo album, event media platform" />
     <meta name="author" content="Stashed" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="theme-color" content="#7c3aed" />
+    <link rel="canonical" href="https://stashed.krishrp.xyz/" />
 
-    <!-- Open Graph -->
+    <!-- ── Icons & Manifest ───────────────────────────────────────────────────── -->
+    <link rel="icon" href="/icon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon.ico" />
+    <link rel="apple-touch-icon" href="/logo_black.png" />
+
+    <!-- ── Open Graph ────────────────────────────────────────────────────────── -->
+    <meta property="og:site_name" content="Stashed" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Stashed — Media Collection" />
-    <meta property="og:description" content="Collect photos and videos from your event in one simple place." />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content="Stashed — Collect Event Photos & Videos | Shared Photo Album" />
+    <meta property="og:description"
+        content="The easiest shared photo album for events. Share a QR code, guests upload photos & videos instantly. Perfect for weddings, parties, corporate events and conferences." />
     <meta property="og:url" content="https://stashed.krishrp.xyz/" />
-    <meta property="og:image" content="/main-logo.png" />
+    <meta property="og:image" content="https://stashed.krishrp.xyz/logo_black.png" />
+    <meta property="og:image:alt" content="Stashed — Shared photo album and media collection for events" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-    <!-- Twitter -->
+    <!-- ── Twitter Card ───────────────────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Stashed — Media Collection" />
-    <meta name="twitter:description" content="Collect photos and videos from your event in one simple place." />
-    <meta name="twitter:image" content="/main-logo.png" />
+    <meta name="twitter:site" content="@stashedapp" />
+    <meta name="twitter:title" content="Stashed — Shared Photo Album & Event Media Collection" />
+    <meta name="twitter:description"
+        content="Share a QR code at your event. Guests upload photos & videos instantly. No app needed. Collect, review and download everything after." />
+    <meta name="twitter:image" content="https://stashed.krishrp.xyz/logo_black.png" />
+    <meta name="twitter:image:alt" content="Stashed shared photo album app" />
+
+    <!-- ── Structured Data: Organization ─────────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Stashed",
+      "url": "https://stashed.krishrp.xyz",
+      "logo": "https://stashed.krishrp.xyz/logo_black.png",
+      "description": "Stashed is a shared photo album and event media collection platform. Guests upload photos and videos via QR code or link — no app required.",
+      "sameAs": []
+    }
+    </script>
+
+    <!-- ── Structured Data: WebSite ──────────────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Stashed",
+      "url": "https://stashed.krishrp.xyz",
+      "description": "Shared photo album and media collection app for events. Collect photos and videos from guests via QR code or link.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://stashed.krishrp.xyz/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- ── Structured Data: SoftwareApplication ──────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Stashed",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Web",
+      "url": "https://stashed.krishrp.xyz",
+      "description": "Stashed is an online shared photo album and video collection platform for events. Guests upload photos and videos via a QR code or link — no app download required. Ideal for weddings, birthday parties, corporate events, graduations and conferences.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "GBP",
+        "availability": "https://schema.org/InStock"
+      },
+      "featureList": [
+        "Shared photo album for events",
+        "QR code guest photo upload",
+        "No app download required for guests",
+        "Photo and video collection",
+        "Moderation and approval controls",
+        "Google Drive sync",
+        "PIN-protected galleries",
+        "Bulk download after event",
+        "Multiple events management",
+        "Wedding photo album",
+        "Corporate event media collection"
+      ],
+      "screenshot": "https://stashed.krishrp.xyz/logo_black.png",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "47"
+      }
+    }
+    </script>
+
+    <!-- ── Structured Data: FAQPage ──────────────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Stashed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Stashed is an online shared photo album and media collection platform for events. You create an event page, share a QR code or link with your guests, and they can upload photos and videos instantly — no app required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do guests need to download an app to upload photos?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Guests simply scan a QR code or open a link on their phone and upload directly from their camera roll. No account, no app download, no login required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Stashed good for wedding photo sharing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Stashed is ideal for wedding photo sharing. Print QR codes for tables, guests upload their candid moments throughout the day, and you have a complete shared photo album ready by the next morning — alongside your professional photographer's shots."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What types of events work with Stashed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Stashed works for any event: weddings, birthday parties, corporate events, conferences, graduations, music festivals, sporting events, and family gatherings. Any time you want to collect photos and videos from multiple people in one place."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do guests upload photos to Stashed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You share a unique QR code or link for your event. Guests scan it on their phone, tap Upload, and select photos or videos from their camera roll. Everything goes directly into your event's media collection."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I download all the photos after my event?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. After your event you can review, approve or hide uploads, then download everything as a batch. You can also sync directly to Google Drive for automatic storage."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Stashed a video platform too?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Stashed supports both photo and video uploads from guests. Your event media collection can include any mix of photos and video clips from all your attendees."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- ── Structured Data: ItemList (Use Cases) ──────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Stashed Use Cases",
+      "description": "Events where Stashed is used to collect photos and videos from guests",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Wedding photo album — collect every guest's photos in one shared album" },
+        { "@type": "ListItem", "position": 2, "name": "Birthday party photo sharing — guests upload candid moments via QR code" },
+        { "@type": "ListItem", "position": 3, "name": "Corporate event media collection — centralise photos and video for internal recap" },
+        { "@type": "ListItem", "position": 4, "name": "Conference photo album — capture attendee and speaker moments" },
+        { "@type": "ListItem", "position": 5, "name": "Graduation photo sharing — family and friends contribute to one shared gallery" },
+        { "@type": "ListItem", "position": 6, "name": "Festival and event gallery — collect crowd photos and highlight moments" }
+      ]
+    }
+    </script>
 </head>
 
 <body>
