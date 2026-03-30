@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /how-it-works
+Allow: /use-cases
+Allow: /contact
+Allow: /privacy
+Allow: /login
+Allow: /signup
+Allow: /gallery/
+Allow: /upload/
+
+# Block private/authenticated routes
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /profile
+Disallow: /signup/success
+Disallow: /api/
+
+# Block query strings that create duplicate content
+Disallow: /*?drive=*
+Disallow: /*?session_id=*
+
+Sitemap: https://stashed.krishrp.xyz/sitemap.xml
