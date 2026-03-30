@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -81,6 +82,25 @@ function CTA({ title, desc }) {
 }
 
 export default function UseCases() {
+    useSEO({
+        title: "Use Cases — Wedding Photo Album, Corporate Events & More",
+        description: "Stashed works for weddings, birthday parties, corporate events, conferences, graduations, festivals and community events. The easiest way to collect a shared photo album from guests.",
+        canonical: "/use-cases",
+        jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Stashed Use Cases — Shared Photo Album for Every Event Type",
+            "description": "Wedding photo sharing, corporate event media collection, birthday party albums, conference galleries and more — Stashed handles every event type.",
+            "url": "https://stashed.krishrp.xyz/use-cases",
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashed.krishrp.xyz/" },
+                    { "@type": "ListItem", "position": 2, "name": "Use Cases", "item": "https://stashed.krishrp.xyz/use-cases" }
+                ]
+            }
+        }
+    });
     const useCases = [
         {
             title: "Weddings",
