@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -65,6 +66,12 @@ function PinGate({ onSubmit, error, loading }) {
 export default function Gallery() {
     const { userId, slug } = useParams();
     const [event,       setEvent]       = useState(null);
+    useSEO({
+        title: event ? `${event.title} — Event Photo Gallery` : "Event Photo Gallery",
+        description: event
+            ? `Browse the shared photo album for ${event.title}. View and download photos and videos uploaded by guests.`
+            : "Browse the event photo gallery on Stashed — a shared photo album where guests upload photos and videos.",
+    });
     const [uploads,     setUploads]     = useState([]);
     const [loading,     setLoading]     = useState(true);
     const [error,       setError]       = useState(null);
