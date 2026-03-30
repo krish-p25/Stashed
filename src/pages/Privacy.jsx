@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow   from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -16,6 +17,11 @@ function Section({ title, children }) {
 }
 
 export default function Privacy() {
+    useSEO({
+        title: "Privacy Policy — Stashed",
+        description: "Read the Stashed privacy policy. How we handle data for event hosts and guests using our photo and video collection platform.",
+        canonical: "/privacy",
+    });
     return (
         <div className="min-h-screen text-zinc-900">
             <Glow />
