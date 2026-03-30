@@ -30,6 +30,7 @@ export default function Header() {
     const authedLinks = [
         { href: "/dashboard",            label: "Dashboard"  },
         { href: "/dashboard/events/new", label: "New Event"  },
+        { href: "/profile",              label: "Profile"    },
         ...(user?.isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
     ];
 
