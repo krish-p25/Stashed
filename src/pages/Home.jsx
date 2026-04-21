@@ -1,34 +1,39 @@
 import { useRef } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Glow from "../components/Glow";
 import { useSEO } from "../hooks/useSEO";
 
-// ── Design tokens ──────────────────────────────────────────────────────────────
+// ── Design tokens (white / violet palette) ─────────────────────────────────────
 const C = {
-    bg:      "#0d0b0a",
-    surface: "#141210",
-    card:    "#1c1814",
-    border:  "#262018",
-    text:    "#ede8df",
-    muted:   "#8a7a68",
-    dim:     "#4a3d30",
-    accent:  "#c8913a",
+    bg:      "#ffffff",
+    surface: "#faf9ff",
+    card:    "#ffffff",
+    border:  "#ddd6fe",   // violet-200
+    borderHover: "#c4b5fd", // violet-300
+    text:    "#18181b",   // zinc-900
+    muted:   "#52525b",   // zinc-600
+    dim:     "#a1a1aa",   // zinc-400
+    accent:  "#7c3aed",   // violet-600
+    accentHover: "#6d28d9", // violet-700
+    accentBg:    "#f5f3ff", // violet-50
+    accentBgMed: "#ede9fe", // violet-100
     display: "'Playfair Display', Georgia, serif",
     mono:    "'DM Mono', 'Courier New', monospace",
     sans:    "'DM Sans', system-ui, sans-serif",
 };
 
-// Warm-tinted photo thumbnail gradients — suggest real event photos
+// Violet-tinted photo thumbnail gradients
 const THUMBS = [
-    "linear-gradient(135deg,#2a1f14,#3d2d1a)",
-    "linear-gradient(135deg,#14202a,#1c2d3d)",
-    "linear-gradient(135deg,#1a2414,#243320)",
-    "linear-gradient(135deg,#2a1420,#3d1a2c)",
-    "linear-gradient(135deg,#201c14,#2e2618)",
-    "linear-gradient(135deg,#141e2a,#1c283d)",
-    "linear-gradient(135deg,#241814,#332212)",
-    "linear-gradient(135deg,#1a1424,#261a38)",
-    "linear-gradient(135deg,#221e18,#302a20)",
+    "linear-gradient(135deg,#ede9fe,#ddd6fe)",
+    "linear-gradient(135deg,#f5f3ff,#e0e7ff)",
+    "linear-gradient(135deg,#e0e7ff,#c7d2fe)",
+    "linear-gradient(135deg,#f0f0ff,#e8e0ff)",
+    "linear-gradient(135deg,#ede9fe,#e0e7ff)",
+    "linear-gradient(135deg,#f5f3ff,#ede9fe)",
+    "linear-gradient(135deg,#e8e0ff,#ddd6fe)",
+    "linear-gradient(135deg,#e0e7ff,#ede9fe)",
+    "linear-gradient(135deg,#f0ebff,#e0e7ff)",
 ];
 
 const REVIEWS = [
@@ -42,10 +47,10 @@ const REVIEWS = [
 ];
 
 const USE_CASES = [
-    { title: "Weddings",    desc: "Collect every guest's candid moments — no chasing uploads."       },
-    { title: "Corporate",   desc: "Centralise media for internal recaps and social content."          },
-    { title: "Parties",     desc: "One link for everyone. No group chats needed."                    },
-    { title: "Conferences", desc: "Capture attendee content and speaker highlights in one place."    },
+    { title: "Weddings",    desc: "Collect every guest's candid moments — no chasing uploads."      },
+    { title: "Corporate",   desc: "Centralise media for internal recaps and social content."         },
+    { title: "Parties",     desc: "One link for everyone. No group chats needed."                   },
+    { title: "Conferences", desc: "Capture attendee content and speaker highlights in one place."   },
 ];
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
@@ -72,7 +77,7 @@ function Divider() {
 function StepCard({ num, title, desc }) {
     return (
         <div>
-            <div style={{ fontFamily: C.display, fontSize: "72px", fontWeight: 900, color: C.border, lineHeight: 1, userSelect: "none", marginBottom: "-12px" }}>{num}</div>
+            <div style={{ fontFamily: C.display, fontSize: "72px", fontWeight: 900, color: C.accentBgMed, lineHeight: 1, userSelect: "none", marginBottom: "-12px" }}>{num}</div>
             <div style={{ height: "1px", background: C.border, margin: "0 0 18px" }} />
             <h3 style={{ fontFamily: C.sans, color: C.text, fontSize: "16px", fontWeight: 600 }}>{title}</h3>
             <p style={{ fontFamily: C.sans, color: C.muted, fontSize: "14px", lineHeight: 1.7, marginTop: "8px" }}>{desc}</p>
@@ -83,11 +88,11 @@ function StepCard({ num, title, desc }) {
 function FeatureCard({ icon, title, desc }) {
     return (
         <div
-            style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "28px", transition: "border-color 0.2s, transform 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent + "55"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "translateY(0)"; }}
+            style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "28px", transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = C.borderHover; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(139,92,246,0.1)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
         >
-            <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: C.accent + "18", border: `1px solid ${C.accent}30`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: C.accentBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}>
                 <span style={{ color: C.accent, fontSize: "16px" }}>{icon}</span>
             </div>
             <h3 style={{ fontFamily: C.sans, color: C.text, fontSize: "15px", fontWeight: 600 }}>{title}</h3>
@@ -99,10 +104,10 @@ function FeatureCard({ icon, title, desc }) {
 function ReviewCard({ quote, name, meta }) {
     return (
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", minWidth: "300px", maxWidth: "300px", flexShrink: 0 }}>
-            <div style={{ color: C.accent, fontFamily: C.mono, fontSize: "32px", lineHeight: 1, opacity: 0.6, marginBottom: "4px" }}>"</div>
+            <div style={{ color: C.accent, fontFamily: C.mono, fontSize: "32px", lineHeight: 1, opacity: 0.5, marginBottom: "4px" }}>"</div>
             <p style={{ color: C.muted, fontFamily: C.sans, fontSize: "14px", lineHeight: 1.75 }}>{quote}</p>
             <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: `1px solid ${C.border}` }}>
-                <div style={{ color: C.text, fontFamily: C.sans, fontSize: "13px", fontWeight: 500 }}>{name}</div>
+                <div style={{ color: C.text, fontFamily: C.sans, fontSize: "13px", fontWeight: 600 }}>{name}</div>
                 <div style={{ color: C.dim, fontFamily: C.mono, fontSize: "11px", marginTop: "2px", letterSpacing: "0.05em" }}>{meta}</div>
             </div>
         </div>
@@ -112,9 +117,9 @@ function ReviewCard({ quote, name, meta }) {
 function UseCaseCard({ title, desc }) {
     return (
         <div
-            style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", transition: "border-color 0.2s, transform 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent + "40"; e.currentTarget.style.transform = "translateY(-3px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "translateY(0)"; }}
+            style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = C.borderHover; e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(139,92,246,0.1)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
         >
             <div style={{ fontFamily: C.sans, color: C.text, fontWeight: 600, fontSize: "15px" }}>{title}</div>
             <div style={{ fontFamily: C.sans, color: C.muted, fontSize: "13px", lineHeight: 1.7, marginTop: "8px" }}>{desc}</div>
@@ -145,12 +150,10 @@ export default function Home() {
 
     return (
         <div style={{ background: C.bg, minHeight: "100vh", color: C.text }}>
+            <Glow />
             <Header />
 
             <main style={{ position: "relative" }}>
-
-                {/* Subtle amber radial — replaces blob glows */}
-                <div aria-hidden="true" style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, backgroundImage: `radial-gradient(ellipse 70% 40% at 50% -10%, ${C.accent}0d, transparent)` }} />
 
                 {/* ── Hero ────────────────────────────────────────────────────── */}
                 <section style={{ paddingTop: "128px", paddingBottom: "100px", position: "relative", zIndex: 1 }}>
@@ -160,9 +163,9 @@ export default function Home() {
                             {/* Left — copy */}
                             <div>
                                 {/* Label pill */}
-                                <div className="home-fade-1" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: C.card, border: `1px solid ${C.border}`, borderRadius: "999px", padding: "5px 14px", marginBottom: "28px" }}>
+                                <div className="home-fade-1" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: C.accentBg, border: `1px solid ${C.border}`, borderRadius: "999px", padding: "5px 14px", marginBottom: "28px" }}>
                                     <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: C.accent, flexShrink: 0, display: "inline-block", animation: "pulse-dot 2.5s ease-in-out infinite" }} />
-                                    <span style={{ fontFamily: C.mono, fontSize: "11px", color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase" }}>Event Media Collection</span>
+                                    <span style={{ fontFamily: C.mono, fontSize: "11px", color: C.accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>Event Media Collection</span>
                                 </div>
 
                                 {/* Headline */}
@@ -180,17 +183,17 @@ export default function Home() {
                                 <div className="home-fade-4" style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginTop: "34px" }}>
                                     <a
                                         href="/signup"
-                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", background: C.accent, color: C.bg, fontFamily: C.sans, fontWeight: 700, fontSize: "14px", borderRadius: "10px", padding: "13px 26px", textDecoration: "none", transition: "opacity 0.2s" }}
-                                        onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-                                        onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", background: C.accent, color: "#ffffff", fontFamily: C.sans, fontWeight: 700, fontSize: "14px", borderRadius: "10px", padding: "13px 26px", textDecoration: "none", transition: "background 0.2s" }}
+                                        onMouseEnter={e => (e.currentTarget.style.background = C.accentHover)}
+                                        onMouseLeave={e => (e.currentTarget.style.background = C.accent)}
                                     >
                                         Get Started →
                                     </a>
                                     <a
                                         href="/how-it-works"
-                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", border: `1px solid ${C.border}`, color: C.muted, fontFamily: C.sans, fontSize: "14px", borderRadius: "10px", padding: "13px 22px", textDecoration: "none", transition: "all 0.2s" }}
-                                        onMouseEnter={e => { e.currentTarget.style.borderColor = C.dim; e.currentTarget.style.color = C.text; }}
-                                        onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.muted; }}
+                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", border: `1px solid #e4e4e7`, color: C.muted, fontFamily: C.sans, fontSize: "14px", borderRadius: "10px", padding: "13px 22px", textDecoration: "none", background: "#ffffff", transition: "all 0.2s" }}
+                                        onMouseEnter={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.text; e.currentTarget.style.background = C.accentBg; }}
+                                        onMouseLeave={e => { e.currentTarget.style.borderColor = "#e4e4e7"; e.currentTarget.style.color = C.muted; e.currentTarget.style.background = "#ffffff"; }}
                                     >
                                         How it works
                                     </a>
@@ -199,13 +202,13 @@ export default function Home() {
                                 {/* Tags */}
                                 <div className="home-fade-5" style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "26px" }}>
                                     {["No app required", "QR or link share", "Guest uploads in seconds"].map(t => (
-                                        <span key={t} style={{ border: `1px solid ${C.border}`, color: C.dim, fontFamily: C.mono, fontSize: "11px", borderRadius: "999px", padding: "4px 12px", letterSpacing: "0.04em" }}>{t}</span>
+                                        <span key={t} style={{ border: `1px solid ${C.border}`, color: "#7c3aed", background: C.accentBg, fontFamily: C.mono, fontSize: "11px", borderRadius: "999px", padding: "4px 12px", letterSpacing: "0.04em" }}>{t}</span>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Right — Live gallery mockup */}
-                            <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "20px", padding: "24px", boxShadow: "0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)" }}>
+                            <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "20px", padding: "24px", boxShadow: "0 20px 60px rgba(139,92,246,0.12), 0 4px 16px rgba(139,92,246,0.06)" }}>
 
                                 {/* Event header bar */}
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "18px" }}>
@@ -213,7 +216,7 @@ export default function Home() {
                                         <div style={{ fontFamily: C.sans, color: C.text, fontWeight: 600, fontSize: "14px" }}>Summer Wedding</div>
                                         <div style={{ fontFamily: C.mono, color: C.dim, fontSize: "11px", marginTop: "2px", letterSpacing: "0.05em" }}>sarah-tom-2024</div>
                                     </div>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "6px", background: C.card, border: `1px solid ${C.accent}35`, borderRadius: "999px", padding: "5px 12px" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "6px", background: C.accentBg, border: `1px solid ${C.border}`, borderRadius: "999px", padding: "5px 12px" }}>
                                         <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: C.accent, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
                                         <span style={{ fontFamily: C.mono, color: C.accent, fontSize: "11px", letterSpacing: "0.05em" }}>47 uploads</span>
                                     </div>
@@ -233,7 +236,7 @@ export default function Home() {
                                         <div style={{ fontFamily: C.sans, color: C.text, fontSize: "12px", fontWeight: 500 }}>Guest upload · just now</div>
                                         <div style={{ fontFamily: C.mono, color: C.dim, fontSize: "11px", marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>ceremony_candid_032.jpg</div>
                                     </div>
-                                    <span style={{ fontFamily: C.mono, color: C.accent, fontSize: "11px", flexShrink: 0, background: C.accent + "18", border: `1px solid ${C.accent}30`, borderRadius: "999px", padding: "2px 9px" }}>new</span>
+                                    <span style={{ fontFamily: C.mono, color: C.accent, fontSize: "11px", flexShrink: 0, background: C.accentBg, border: `1px solid ${C.border}`, borderRadius: "999px", padding: "2px 9px" }}>new</span>
                                 </div>
                             </div>
 
@@ -252,9 +255,9 @@ export default function Home() {
                             <em style={{ fontStyle: "italic", color: C.muted }}>Controlled for hosts.</em>
                         </SectionHeading>
                         <div className="grid gap-10 md:grid-cols-3">
-                            <StepCard num="01" title="Create an event"       desc="Set up an event page in seconds. Add a name, optional PIN protection, and upload limits." />
-                            <StepCard num="02" title="Share QR or link"      desc="Print QR codes for tables or send the link via WhatsApp. Guests need no account." />
-                            <StepCard num="03" title="Review & download"     desc="Approve, hide, or feature uploads. Download everything as a zip after your event." />
+                            <StepCard num="01" title="Create an event"        desc="Set up an event page in seconds. Add a name, optional PIN protection, and upload limits." />
+                            <StepCard num="02" title="Share QR or link"       desc="Print QR codes for tables or send the link via WhatsApp. Guests need no account." />
+                            <StepCard num="03" title="Review & download"      desc="Approve, hide, or feature uploads. Download everything as a zip after your event." />
                         </div>
                     </div>
                 </section>
@@ -287,19 +290,13 @@ export default function Home() {
                         <h2 style={{ fontFamily: C.display, fontSize: "clamp(26px,3.2vw,42px)", fontWeight: 900, color: C.text, lineHeight: 1.12, marginBottom: "40px" }}>
                             What organisers say.
                         </h2>
-                    </div>
-                    {/* Full-bleed horizontal scroll */}
-                    <div
-                        ref={scrollerRef}
-                        style={{ overflowX: "auto", paddingBottom: "8px", scrollbarWidth: "thin", scrollbarColor: `${C.dim} transparent`, cursor: "grab" }}
-                    >
-                        <div style={{
-                            display: "flex",
-                            gap: "16px",
-                            paddingLeft:  "max(16px, calc((100vw - 1152px) / 2 + 32px))",
-                            paddingRight: "max(16px, calc((100vw - 1152px) / 2 + 32px))",
-                        }}>
-                            {REVIEWS.map((r, i) => <ReviewCard key={i} {...r} />)}
+                        <div
+                            ref={scrollerRef}
+                            style={{ overflowX: "auto", paddingBottom: "8px", scrollbarWidth: "thin", scrollbarColor: `${C.border} transparent`, cursor: "grab" }}
+                        >
+                            <div style={{ display: "flex", gap: "16px" }}>
+                                {REVIEWS.map((r, i) => <ReviewCard key={i} {...r} />)}
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -322,9 +319,9 @@ export default function Home() {
                 {/* ── CTA ─────────────────────────────────────────────────────── */}
                 <section style={{ padding: "80px 0 100px", position: "relative", zIndex: 1 }}>
                     <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-                        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "24px", padding: "clamp(48px,7vw,96px) clamp(32px,5vw,72px)", textAlign: "center", position: "relative", overflow: "hidden" }}>
-                            {/* Ambient amber */}
-                            <div aria-hidden="true" style={{ position: "absolute", top: "-40px", left: "50%", transform: "translateX(-50%)", width: "480px", height: "180px", background: `radial-gradient(ellipse, ${C.accent}12, transparent)`, pointerEvents: "none" }} />
+                        <div style={{ background: C.accentBg, border: `1px solid ${C.border}`, borderRadius: "24px", padding: "clamp(48px,7vw,96px) clamp(32px,5vw,72px)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+                            {/* Ambient violet */}
+                            <div aria-hidden="true" style={{ position: "absolute", top: "-40px", left: "50%", transform: "translateX(-50%)", width: "480px", height: "180px", background: "radial-gradient(ellipse, rgba(139,92,246,0.12), transparent)", pointerEvents: "none" }} />
 
                             <div style={{ position: "relative" }}>
                                 <SectionLabel>Get started</SectionLabel>
@@ -338,9 +335,9 @@ export default function Home() {
                                 <div style={{ marginTop: "36px" }}>
                                     <a
                                         href="/signup"
-                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", background: C.accent, color: C.bg, fontFamily: C.sans, fontWeight: 700, fontSize: "15px", borderRadius: "12px", padding: "15px 34px", textDecoration: "none", transition: "opacity 0.2s" }}
-                                        onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-                                        onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", background: C.accent, color: "#ffffff", fontFamily: C.sans, fontWeight: 700, fontSize: "15px", borderRadius: "12px", padding: "15px 34px", textDecoration: "none", transition: "background 0.2s" }}
+                                        onMouseEnter={e => (e.currentTarget.style.background = C.accentHover)}
+                                        onMouseLeave={e => (e.currentTarget.style.background = C.accent)}
                                     >
                                         Get Started for Free →
                                     </a>
@@ -350,12 +347,8 @@ export default function Home() {
                     </div>
                 </section>
 
-            </main>
-
-            {/* Footer on light background for contrast */}
-            <div style={{ background: "#ffffff" }}>
                 <Footer />
-            </div>
+            </main>
         </div>
     );
 }
