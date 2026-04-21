@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
+import { C } from "../lib/design";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
@@ -253,7 +254,7 @@ function DetailsStep({ form, setForm, onNext }) {
     return (
         <div className="space-y-5">
             <div>
-                <h1 className="text-2xl font-bold text-zinc-900">Create your account</h1>
+                <h1 style={{ fontFamily: C.display, fontSize: "26px", fontWeight: 900, color: C.text, lineHeight: 1.1 }}>Create your account</h1>
                 <p className="mt-1 text-sm text-zinc-500">Get started in under a minute.</p>
                 <Reveal show={!!error}>
                     <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 mt-4">
@@ -416,7 +417,7 @@ function UseCaseStep({ form, setForm, onNext, onBack }) {
     return (
         <div className="space-y-5">
             <div>
-                <h1 className="text-2xl font-bold text-zinc-900">Tell us about your events</h1>
+                <h1 style={{ fontFamily: C.display, fontSize: "26px", fontWeight: 900, color: C.text, lineHeight: 1.1 }}>Tell us about your events</h1>
                 <p className="mt-1 text-sm text-zinc-500">Help us personalise your experience.</p>
             </div>
 
@@ -526,7 +527,7 @@ function PlanStep({ form, onBack, onProceed }) {
     return (
         <div className="space-y-5">
             <div>
-                <h1 className="text-2xl font-bold text-zinc-900">You're one step away</h1>
+                <h1 style={{ fontFamily: C.display, fontSize: "26px", fontWeight: 900, color: C.text, lineHeight: 1.1 }}>You're one step away</h1>
                 <p className="mt-1 text-sm text-zinc-500">Complete your payment to unlock Stashed.</p>
             </div>
 
@@ -626,7 +627,7 @@ function CheckoutStep({ clientSecret, onBack }) {
                     ← Back
                 </button>
                 <div>
-                    <h1 className="text-xl font-bold text-zinc-900">Complete your payment</h1>
+                    <h1 style={{ fontFamily: C.display, fontSize: "22px", fontWeight: 900, color: C.text, lineHeight: 1.1 }}>Complete your payment</h1>
                     <p className="text-xs text-zinc-500">Secured by Stripe</p>
                 </div>
             </div>
