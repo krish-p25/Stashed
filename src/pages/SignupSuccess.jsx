@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
+import { C } from "../lib/design";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -69,7 +70,7 @@ export default function SignupSuccess() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-lg font-bold text-zinc-900">Welcome to Stashed!</p>
+                                    <p style={{ fontFamily: C.display, fontSize: "22px", fontWeight: 900, color: C.text }}>Welcome to Stashed!</p>
                                     <p className="mt-1 text-sm text-zinc-500">Your account is ready. Taking you to your dashboard…</p>
                                 </div>
                                 <div className="h-1 w-full rounded-full bg-zinc-100 overflow-hidden">
