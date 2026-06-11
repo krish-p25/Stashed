@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -21,7 +21,38 @@ const STATUS_STYLES = {
     pending_drive: "border-violet-200 bg-violet-50 text-violet-600",
 };
 
+function CopyUrlButton({ url }) {
+    const [copied, setCopied] = useState(false);
+
+    async function handleCopy(e) {
+        e.stopPropagation();
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }
+
+    return (
+        <button
+            onClick={handleCopy}
+            title={copied ? "Copied!" : "Copy link"}
+            className="cursor-pointer shrink-0 text-violet-400 hover:text-violet-600 transition-colors duration-200"
+        >
+            {copied ? (
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+            ) : (
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+            )}
+        </button>
+    );
+}
+
 function EventCard({ event, onClick }) {
+    const uploadUrl = `${window.location.origin}/upload/${event.userId}/${event.slug}`;
+
     return (
         <div
             onClick={onClick}
@@ -36,9 +67,10 @@ function EventCard({ event, onClick }) {
                 </span>
             </div>
 
-            <span className="inline-block self-start rounded-lg border border-violet-100 bg-violet-50 px-2 py-0.5 font-mono text-xs text-violet-600">
-                /{event.slug}
-            </span>
+            <div className="inline-flex items-center gap-1.5 self-start rounded-lg border border-violet-100 bg-violet-50 px-2 py-0.5 min-w-0 max-w-full">
+                <span className="font-mono text-xs text-violet-600 truncate flex-1">{uploadUrl}</span>
+                <CopyUrlButton url={uploadUrl} />
+            </div>
 
             <div className="mt-auto flex items-center justify-between text-xs text-zinc-400">
                 <span>{event.uploadCount} {event.uploadCount === 1 ? "upload" : "uploads"}</span>
@@ -82,6 +114,7 @@ export default function Dashboard() {
                 const json = await res.json();
                 if (!json.ok) throw new Error(json.error || "Failed to load dashboard.");
                 setData(json);
+                auth.updateUser(json.user);
             } catch (err) {
                 setError(err.message);
             } finally {

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Glow   from "../components/Glow";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -31,8 +31,25 @@ export default function CreateEvent() {
     const [pinEnabled,  setPinEnabled]  = useState(false);
     const [pin,         setPin]         = useState("");
     const [showPin,     setShowPin]     = useState(false);
-    const [submitting,  setSubmitting]  = useState(false);
-    const [error,       setError]       = useState(null);
+    const [submitting,    setSubmitting]    = useState(false);
+    const [error,         setError]         = useState(null);
+    const [slugSuggestion, setSlugSuggestion] = useState(null); // null | string
+
+    useEffect(() => {
+        if (!slug) { setSlugSuggestion(null); return; }
+        const timer = setTimeout(async () => {
+            try {
+                const res  = await fetch(`${API}/api/events/check-slug?slug=${encodeURIComponent(slug)}`, {
+                    headers: { Authorization: `Bearer ${auth.token}` },
+                });
+                const json = await res.json();
+                setSlugSuggestion(json.available ? null : json.suggestedSlug);
+            } catch {
+                setSlugSuggestion(null);
+            }
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [slug, auth.token]);
 
     function handleTitleChange(e) {
         const val = e.target.value;
@@ -125,10 +142,12 @@ export default function CreateEvent() {
                         <p className="mt-1 text-sm text-zinc-500">Set up a new event to collect guest uploads.</p>
                     </div>
 
-                    {/* Info banner */}
-                    <div className="mb-6 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-700">
-                        After creating the event you'll be asked to connect Google Drive so uploads land in a dedicated folder.
-                    </div>
+                    {/* Info banner — only shown when Drive is not yet connected */}
+                    {!auth.user?.driveConnected && (
+                        <div className="mb-6 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-700">
+                            After creating the event you'll be asked to connect Google Drive so uploads land in a dedicated folder.
+                        </div>
+                    )}
 
                     {error && (
                         <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
@@ -168,6 +187,11 @@ export default function CreateEvent() {
                                 />
                             </div>
                             <p className="mt-1 text-xs text-zinc-400">Auto-derived from title. Guests will use this URL.</p>
+                            {slugSuggestion && (
+                                <p className="mt-1.5 text-xs text-amber-600">
+                                    That slug is already used — your event will be saved as <strong>{slugSuggestion}</strong>.
+                                </p>
+                            )}
                         </div>
 
                         <div>

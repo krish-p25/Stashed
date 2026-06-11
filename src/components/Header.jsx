@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 export default function Header() {
     const [scrolled,  setScrolled]  = useState(false);
-    const [menuOpen,  setMenuOpen]  = useState(false);
+    const [menuOpenPath, setMenuOpenPath] = useState(null);
     const { pathname } = useLocation();
     const navigate     = useNavigate();
     const { token, user, logout } = useAuth();
@@ -14,10 +14,6 @@ export default function Header() {
         window.addEventListener("scroll", onScroll, { passive: true });
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
-
-    useEffect(() => {
-        setMenuOpen(false);
-    }, [pathname]);
 
     function handleLogout() {
         logout();
@@ -34,29 +30,32 @@ export default function Header() {
     const authedLinks = [
         { href: "/dashboard",            label: "Dashboard"  },
         { href: "/dashboard/events/new", label: "New Event"  },
+        { href: "/profile",              label: "Profile"    },
+        ...(user?.isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
     ];
 
     const navLinks = token ? authedLinks : guestLinks;
+    const menuOpen = menuOpenPath === pathname;
 
     return (
         <div className="fixed inset-x-0 top-0 z-50 pointer-events-none">
             <div
-                className={`pointer-events-auto mx-auto transition-all duration-300 ease-linear ${
+                className={`pointer-events-auto mx-auto transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                     scrolled
                         ? "mt-3 max-w-5xl px-4 sm:px-6"
                         : "mt-0 max-w-[100vw] px-0"
                 }`}
             >
                 <div
-                    className={`transition-all duration-300 ease-linear ${
+                    className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                         scrolled
-                            ? "bg-white/60 backdrop-blur-xl rounded-2xl border border-violet-200/60 shadow-[0_8px_40px_rgba(139,92,246,0.18)]"
+                            ? "bg-white/40 backdrop-blur-xl rounded-2xl border border-violet-200/60 shadow-[0_8px_40px_rgba(139,92,246,0.18)]"
                             : "bg-white/90 backdrop-blur-md border-b border-transparent shadow-none rounded-none"
                     }`}
                 >
                     {/* Main bar */}
                     <div
-                        className={`flex items-center justify-between w-full px-5 sm:px-6 transition-[height] duration-300 ease-linear ${
+                        className={`flex items-center justify-between w-full px-5 sm:px-6 transition-[height] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                             scrolled ? "h-14" : "h-16"
                         }`}
                     >
@@ -75,7 +74,7 @@ export default function Header() {
                                 <a
                                     key={href}
                                     href={href}
-                                    className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                                    className={`px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
                                         pathname === href
                                             ? "text-violet-700 bg-violet-100 font-medium"
                                             : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
@@ -88,16 +87,16 @@ export default function Header() {
                             {token ? (
                                 <button
                                     onClick={handleLogout}
-                                    className="ml-3 cursor-pointer inline-flex items-center justify-center rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
+                                    className="ml-3 cursor-pointer inline-flex items-center justify-center rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 transition-colors duration-200"
                                 >
                                     Sign Out
                                 </button>
                             ) : (
                                 <a
-                                    href="/contact"
-                                    className="ml-3 inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 transition-colors"
+                                    href="/signup"
+                                    className="ml-3 inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 transition-colors duration-200"
                                 >
-                                    Get early access
+                                    Sign Up
                                 </a>
                             )}
                         </nav>
@@ -106,15 +105,19 @@ export default function Header() {
                         <div className="flex items-center gap-2 md:hidden">
                             {!token && (
                                 <a
-                                    href="/contact"
-                                    className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors"
+                                    href="/signup"
+                                    className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors duration-200"
                                 >
-                                    Get access
+                                    Sign Up
                                 </a>
                             )}
                             <button
-                                onClick={() => setMenuOpen((v) => !v)}
-                                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 transition-colors"
+                                onClick={() => {
+                                    setMenuOpenPath((currentPath) => (
+                                        currentPath === pathname ? null : pathname
+                                    ));
+                                }}
+                                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 transition-colors duration-200"
                                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                             >
                                 {menuOpen ? (
@@ -132,7 +135,7 @@ export default function Header() {
 
                     {/* Mobile dropdown */}
                     <div
-                        className={`overflow-hidden transition-all duration-200 ease-linear md:hidden ${
+                        className={`overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] md:hidden ${
                             menuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
                         }`}
                     >
@@ -142,7 +145,7 @@ export default function Header() {
                                     <a
                                         key={href}
                                         href={href}
-                                        className={`rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                                        className={`rounded-lg px-3 py-2.5 text-sm transition-colors duration-200 ${
                                             pathname === href
                                                 ? "bg-violet-100 text-violet-700 font-medium"
                                                 : "text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900"
@@ -154,7 +157,7 @@ export default function Header() {
                                 {token && (
                                     <button
                                         onClick={handleLogout}
-                                        className="cursor-pointer mt-1 rounded-lg px-3 py-2.5 text-left text-sm text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+                                        className="cursor-pointer mt-1 rounded-lg px-3 py-2.5 text-left text-sm text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors duration-200"
                                     >
                                         Sign Out
                                     </button>

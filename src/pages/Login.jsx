@@ -3,7 +3,8 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow   from "../components/Glow";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { C } from "../lib/design";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -72,11 +73,11 @@ export default function Login() {
                         <div className="rounded-2xl border border-violet-200/70 bg-white p-6 sm:p-8 shadow-md shadow-violet-100/30">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-sm text-zinc-500">Early access</p>
-                                    <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">Log in</h1>
+                                    <p style={{ fontFamily: C.mono, color: C.accent, fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase" }}>Early access</p>
+                                    <h1 style={{ fontFamily: C.display, fontSize: "32px", fontWeight: 900, color: C.text, marginTop: "8px", lineHeight: 1.1 }}>Log in</h1>
                                 </div>
                                 <div className="hidden sm:block rounded-2xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-600 whitespace-nowrap">
-                                    Members only
+                                    Members Only
                                 </div>
                             </div>
                             <p className="mt-2 text-sm text-zinc-600 leading-6">

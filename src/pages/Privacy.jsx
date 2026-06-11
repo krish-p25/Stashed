@@ -1,6 +1,8 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Glow   from "../components/Glow";
+import { useSEO } from "../hooks/useSEO";
+import { C } from "../lib/design";
 
 function Container({ children }) {
     return <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">{children}</div>;
@@ -9,13 +11,18 @@ function Container({ children }) {
 function Section({ title, children }) {
     return (
         <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-zinc-900">{title}</h2>
+            <h2 style={{ fontFamily: C.display, fontSize: "18px", fontWeight: 700, color: C.text }}>{title}</h2>
             <div className="space-y-2 text-sm leading-7 text-zinc-600">{children}</div>
         </section>
     );
 }
 
 export default function Privacy() {
+    useSEO({
+        title: "Privacy Policy — Stashed",
+        description: "Read the Stashed privacy policy. How we handle data for event hosts and guests using our photo and video collection platform.",
+        canonical: "/privacy",
+    });
     return (
         <div className="min-h-screen text-zinc-900">
             <Glow />
@@ -24,9 +31,9 @@ export default function Privacy() {
             <main className="pt-24 pb-16 sm:pt-28">
                 <Container>
                     <div className="rounded-2xl border border-violet-200/70 bg-white p-8 sm:p-10 shadow-sm">
-                        <p className="text-sm text-zinc-500">Legal</p>
-                        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">Privacy Policy</h1>
-                        <p className="mt-2 text-sm text-zinc-500">Last updated: March 2025</p>
+                        <div style={{ fontFamily: C.mono, color: C.accent, fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Legal</div>
+                        <h1 style={{ fontFamily: C.display, fontSize: "clamp(28px,3.5vw,42px)", fontWeight: 900, color: C.text, lineHeight: 1.1, marginTop: "10px" }}>Privacy Policy</h1>
+                        <p style={{ fontFamily: C.mono, color: C.dim, fontSize: "12px", letterSpacing: "0.04em", marginTop: "8px" }}>Last updated: March 2025</p>
 
                         <div className="mt-8 space-y-8 divide-y divide-zinc-100">
 
