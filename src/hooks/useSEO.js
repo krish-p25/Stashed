@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const BASE_URL = "https://stashed.krishrp.xyz";
+const BASE_URL = "https://stashedmedia.krishrp.xyz";
 
 function setMeta(name, content, attr = "name") {
     if (!content) return;
