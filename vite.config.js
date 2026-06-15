@@ -6,8 +6,8 @@ export default defineConfig({
     plugins: [react(), tailwindcss()],
     server: {
         host: true,
-        allowedHosts: ['stashed.krishrp.xyz'],
-        proxy: { '/api': 'http://127.0.0.1:3001' },
+        allowedHosts: ['stashedmedia.krishrp.xyz'],
+        proxy: { '/api': 'http://127.0.0.1:3002' },
         headers: { 'Cache-Control': 'no-store' },
     },
 })
