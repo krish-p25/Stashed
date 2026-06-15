@@ -23,4 +23,4 @@ Disallow: /api/
 Disallow: /*?drive=*
 Disallow: /*?session_id=*
 
-Sitemap: https://stashed.krishrp.xyz/sitemap.xml
+Sitemap: https://stashedmedia.krishrp.xyz/sitemap.xml
