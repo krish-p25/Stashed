@@ -214,7 +214,7 @@ function QRModal({ event, uploadUrl, onClose }) {
 
                     {/* Footer */}
                     <div className="px-7 pb-6 flex items-center justify-between">
-                        <span className="text-xs text-zinc-300">stashed.krishrp.xyz</span>
+                        <span className="text-xs text-zinc-300">stashedmedia.krishrp.xyz</span>
                         <button
                             onClick={handleClose}
                             className="cursor-pointer rounded-xl border border-zinc-200 px-4 py-2 text-xs font-medium text-zinc-500 hover:bg-zinc-50 transition-colors duration-200"
