@@ -59,7 +59,7 @@ export default function HowItWorks() {
             "@type": "HowTo",
             "name": "How to collect photos and videos from event guests using Stashed",
             "description": "A 3-step guide to collecting photos and videos from guests at weddings, parties, corporate events and more.",
-            "url": "https://stashed.krishrp.xyz/how-it-works",
+            "url": "https://stashedmedia.krishrp.xyz/how-it-works",
             "step": [
                 { "@type": "HowToStep", "position": 1, "name": "Create an event", "text": "Create an event page in seconds. Set a name, optional PIN, and upload limits." },
                 { "@type": "HowToStep", "position": 2, "name": "Share a QR code or link", "text": "Print a QR for tables or share the link in WhatsApp. Guests open it instantly on their phone — no app download or login required." },
@@ -68,8 +68,8 @@ export default function HowItWorks() {
             "breadcrumb": {
                 "@type": "BreadcrumbList",
                 "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashed.krishrp.xyz/" },
-                    { "@type": "ListItem", "position": 2, "name": "How it works", "item": "https://stashed.krishrp.xyz/how-it-works" }
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashedmedia.krishrp.xyz/" },
+                    { "@type": "ListItem", "position": 2, "name": "How it works", "item": "https://stashedmedia.krishrp.xyz/how-it-works" }
                 ]
             }
         }
