@@ -140,10 +140,10 @@ export default function Home() {
             "@type": "WebPage",
             "name": "Stashed — Shared Photo Album & Event Media Collection",
             "description": "Collect photos and videos from event guests via QR code or link. No app download required. Review, moderate and download everything after your event.",
-            "url": "https://stashed.krishrp.xyz/",
+            "url": "https://stashedmedia.krishrp.xyz/",
             "breadcrumb": {
                 "@type": "BreadcrumbList",
-                "itemListElement": [{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashed.krishrp.xyz/" }],
+                "itemListElement": [{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashedmedia.krishrp.xyz/" }],
             },
         },
     });
