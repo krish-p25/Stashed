@@ -48,12 +48,12 @@ export default function Features() {
             "@type": "WebPage",
             "name": "Stashed Features — Event Photo & Video Collection Platform",
             "description": "Full feature list for Stashed: QR code uploads, moderation, bulk downloads, Google Drive sync, multiple events management.",
-            "url": "https://stashed.krishrp.xyz/features",
+            "url": "https://stashedmedia.krishrp.xyz/features",
             "breadcrumb": {
                 "@type": "BreadcrumbList",
                 "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashed.krishrp.xyz/" },
-                    { "@type": "ListItem", "position": 2, "name": "Features", "item": "https://stashed.krishrp.xyz/features" }
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stashedmedia.krishrp.xyz/" },
+                    { "@type": "ListItem", "position": 2, "name": "Features", "item": "https://stashedmedia.krishrp.xyz/features" }
                 ]
             }
         }
